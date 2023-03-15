@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Film } from "lucide-svelte";
-  import type { imdbVideo } from "$lib/types";
+  import type { movieDBVideo } from "$lib/types";
 
 
-  export let video: imdbVideo;
+  export let video: movieDBVideo;
   export let onClick: () => void;
   export let isSelected: boolean;
 </script>

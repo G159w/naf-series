@@ -3,14 +3,17 @@ import { z } from 'zod';
 import { Timer } from 'timer-node';
 import prisma from "$lib/server/prismadb"
 import * as cheerio from 'cheerio';
-import type { imdbVideo } from '$lib/types';
+import type { movieDBVideo } from '$lib/types';
 
-import { VideoType } from '@prisma/client';
+import type { VideoType } from '@prisma/client';
 
 
 export const load = (async () => {
 	const videos = await prisma.video.findMany({
-		take: 20,
+		include: {
+			creators: true,
+			stars: true,
+		}
 	});
 	return { videos };
 }) satisfies PageServerLoad;
@@ -31,8 +34,8 @@ const scrappedSite = 'https://www.themoviedb.org';
 const getVideos = (html: string, videoType: VideoType) => {
 	const cheerioApi = cheerio.load(html);
 
-	const cheerioVideos = cheerioApi(`${videoType === VideoType.Movie ? '.movie' : '.tv'} .card`)
-	const imdbVideos: imdbVideo[] = []
+	const cheerioVideos = cheerioApi(`${videoType === 'Movie' ? '.movie' : '.tv'} .card`)
+	const imdbVideos: movieDBVideo[] = []
 	cheerioVideos.map((i, el) => {
 		if (i < 6) {
 			const cheerioVideo = cheerio.load(el)
@@ -43,7 +46,7 @@ const getVideos = (html: string, videoType: VideoType) => {
 
 			imdbVideos.push({
 				title,
-				imdbUrl: imdbUrl || '',
+				movieDBUrl: imdbUrl || '',
 				imgUrl,
 				year,
 				type: videoType
@@ -63,7 +66,7 @@ export const actions: Actions = {
 			console.log(timer.time(), searchedVideo);
 			const response = await fetch(`${scrappedSite}/search?query=${searchedVideo}`);
 			const body = await response.text();
-			const imdbVideos = [...getVideos(body, VideoType.Movie), ...getVideos(body, VideoType.Series)];
+			const imdbVideos = [...getVideos(body, 'Movie'), ...getVideos(body, 'Series')];
 			console.log(timer.time(), "imdb found videos", imdbVideos.length);
 			return imdbVideos
 		} catch (error) {
@@ -103,7 +106,7 @@ export const actions: Actions = {
 					imgUrl: `${scrappedSite}${img}`
 				}
 			}).toArray();
-			const videoType = cheerioApi('.movie_wrap').length ? VideoType.Movie : VideoType.Series;
+			const videoType = cheerioApi('.movie_wrap').length ? 'Movie' : 'Series';
 
 			const video = await prisma.video.upsert({
 				where: {

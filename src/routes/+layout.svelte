@@ -2,7 +2,7 @@
   import "@skeletonlabs/skeleton/themes/theme-crimson.css";
   import "@skeletonlabs/skeleton/styles/all.css";
   import "../app.postcss";
-  
+
   import {
     computePosition,
     autoUpdate,
@@ -11,7 +11,12 @@
     offset,
     arrow,
   } from "@floating-ui/dom";
-  import { Drawer, Modal, storePopup, drawerStore } from "@skeletonlabs/skeleton";
+  import {
+    Drawer,
+    Modal,
+    storePopup,
+    drawerStore,
+  } from "@skeletonlabs/skeleton";
   import {
     AppShell,
     AppBar,
@@ -35,8 +40,8 @@
 </script>
 
 <svelte:head>
-	<title>NAF Series</title>
-	<meta name="home" content="NAF Series" />
+  <title>NAF Series</title>
+  <meta name="home" content="NAF Series" />
 </svelte:head>
 
 <div class="card w-48 shadow-xl py-4  z-[999]" data-popup="loginOption">
@@ -57,7 +62,7 @@
 <Modal />
 
 <Drawer>
-	<MovieDrawer />
+  <MovieDrawer />
 </Drawer>
 <!-- App Shell -->
 <AppShell>
@@ -65,9 +70,9 @@
     <!-- App Bar -->
     <AppBar>
       <svelte:fragment slot="lead">
-        <a href="/" class="text-xl uppercase text-red-600 font-bold"
-          >NAF Series</a
-        >
+        <a href="/" class="pl-10 text-xl uppercase text-red-600 font-bold">
+          <img src="nafseries_netflix.png" class=" w-36" />
+        </a>
       </svelte:fragment>
       <svelte:fragment slot="trail">
         <button type="button" class="btn-icon p-0 "><Github /></button>

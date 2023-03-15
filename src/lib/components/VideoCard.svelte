@@ -1,16 +1,19 @@
 <script lang="ts">
-  import { Drawer, drawerStore } from "@skeletonlabs/skeleton";
-  import type { Video } from "@prisma/client";
+  import { drawerStore } from "@skeletonlabs/skeleton";
+  import type { Personality, Video } from "@prisma/client";
   import { Star } from "lucide-svelte";
   import type { DrawerSettings } from "@skeletonlabs/skeleton";
+  import { scale } from "svelte/transition";
 
-  export let video: Video;
+  export let video: (Video & {
+    creators: Personality[];
+    stars: Personality[];
+  });
   const drawerSettings: DrawerSettings = {
     meta: video,
-    width: 'w-[1200px] ',
-    padding: 'p-4',
-    rounded: 'rounded-3xl',
-
+    width: "w-[1200px] ",
+    padding: "p-4",
+    rounded: "rounded-3xl",
   };
 </script>
 

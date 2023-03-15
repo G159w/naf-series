@@ -1,17 +1,16 @@
 <script lang="ts">
   import { enhance, applyAction } from "$app/forms";
-  import { Film, Search } from "lucide-svelte";
-  import type { ModalSettings, ModalComponent } from "@skeletonlabs/skeleton";
-  import type { imdbVideo } from "$lib/types";
+  import {  Search } from "lucide-svelte";
+  import {  modalStore } from "@skeletonlabs/skeleton";
+  import type { movieDBVideo } from "$lib/types";
   import { fade, scale } from "svelte/transition";
-  import { append } from "svelte/internal";
   import { VideoType } from "@prisma/client";
   import VideoSuggestion from "./VideoSuggestion.svelte";
 
-  let imdbVideos = new Array<imdbVideo>();
-  $: movies = imdbVideos.filter((v) => v.type === VideoType.Movie);
-  $: series = imdbVideos.filter((v) => v.type === VideoType.Series);
-  let selectedImdbVideo: imdbVideo | undefined;
+  let movieDBVideos = new Array<movieDBVideo>();
+  $: movies = movieDBVideos.filter((v) => v.type === VideoType.Movie);
+  $: series = movieDBVideos.filter((v) => v.type === VideoType.Series);
+  let selectedMovieDBVideo: movieDBVideo | undefined;
 </script>
 
 <div
@@ -25,9 +24,9 @@
         if (result.type === "error") {
           await applyAction(result);
         } else {
-          selectedImdbVideo = undefined;
-          imdbVideos = result.data;
-          console.log(imdbVideos);
+          selectedMovieDBVideo = undefined;
+          movieDBVideos = result.data;
+          console.log(movieDBVideos);
         }
       };
     }}
@@ -50,12 +49,12 @@
       <div class="flex flex-col gap-4 ali w-full">
         <h3 in:fade>Films</h3>
         <div class="flex flex-row gap-4 flex-wrap w-full">
-          {#each movies as video, i (video.imdbUrl)}
+          {#each movies as video, i (video.movieDBUrl)}
             <div in:scale={{ delay: i * 25 }} class="w-full">
               <VideoSuggestion
                 {video}
-                onClick={() => (selectedImdbVideo = video)}
-                isSelected={video === selectedImdbVideo}
+                onClick={() => (selectedMovieDBVideo = video)}
+                isSelected={video === selectedMovieDBVideo}
               />
             </div>
           {/each}
@@ -66,12 +65,12 @@
       <div class="flex flex-col gap-4 ali w-full">
         <h3>Séries</h3>
         <div class="flex flex-row gap-4 flex-wrap w-full">
-          {#each series as video, i (video.imdbUrl)}
+          {#each series as video, i (video.movieDBUrl)}
             <div in:scale={{ delay: i * 25 }} class="w-full">
               <VideoSuggestion
                 {video}
-                onClick={() => (selectedImdbVideo = video)}
-                isSelected={video === selectedImdbVideo}
+                onClick={() => (selectedMovieDBVideo = video)}
+                isSelected={video === selectedMovieDBVideo}
               />
             </div>
           {/each}
@@ -79,21 +78,14 @@
       </div>
     {/if}
   </div>
-  {#if selectedImdbVideo}
+  {#if selectedMovieDBVideo}
     <div in:fade class="w-full flex ">
       <form
         class="flex w-full justify-end"
         method="POST"
         use:enhance={({ data }) => {
-          data.append("imdbUrl", selectedImdbVideo?.imdbUrl || "");
-          return async ({ result }) => {
-            if (result.type === "error") {
-              await applyAction(result);
-            } else {
-              selectedImdbVideo = undefined;
-              console.log(result);
-            }
-          };
+          data.append("imdbUrl", selectedMovieDBVideo?.movieDBUrl || "");
+          modalStore.close();
         }}
         action="?/addImbdbVideo"
       >
@@ -104,3 +96,4 @@
     <div class="h-[42px]" />
   {/if}
 </div>
+movieDBUrlmovieDBUrl
