@@ -2,11 +2,12 @@
   import { Star } from "lucide-svelte";
   import { fade, scale } from "svelte/transition";
   import { Drawer, drawerStore } from "@skeletonlabs/skeleton";
-  import type { Personality, Video } from "@prisma/client";
+  import type { Personality, Video, Genre } from "@prisma/client";
 
   $: video = $drawerStore.meta as Video & {
     creators: Personality[];
     stars: Personality[];
+    genres: Genre[];
   };
 </script>
 
@@ -47,9 +48,17 @@
         <p in:fade={{ delay: 200 }} class=" italic">
           {video.storyline}
         </p>
+        {#if video.genres.length}
+          <div class="flex flex-row gap-2" in:fade={{ delay: 250 }}>
+            <span class="font-bold"> Genres : </span>
+            {#each video.genres as genre}
+              <a>{genre.name}</a>
+            {/each}
+          </div>
+        {/if}
         {#if video.creators.length}
           <div in:fade={{ delay: 250 }}>
-            <span class="font-bold"> Créateurs: </span>
+            <span class="font-bold"> Créateurs : </span>
             {#each video.creators as creator}
               <div>{creator.name}</div>
             {/each}
@@ -59,7 +68,7 @@
     </div>
 
     <div>
-      <span class="font-bold"> Acteurs: </span>
+      <span class="font-bold"> Acteurs : </span>
       <div class="flex flex-row flex-wrap rounded-2xl gap-8 mt-2">
         {#each video.stars as star, i}
           <div

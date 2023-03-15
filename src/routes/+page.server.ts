@@ -13,6 +13,7 @@ export const load = (async () => {
 		include: {
 			creators: true,
 			stars: true,
+			genres: true,
 		}
 	});
 	return { videos };
@@ -133,6 +134,12 @@ export const actions: Actions = {
 						connectOrCreate: actors.map((actor) => ({
 							where: { name: actor.name },
 							create: { name: actor.name, imgUrl: actor.imgUrl }
+						}))
+					},
+					genres: {
+						connectOrCreate: genres.map((genre) => ({
+							where: { name: genre },
+							create: { name: genre }
 						}))
 					}
 				},
