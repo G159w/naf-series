@@ -37,9 +37,9 @@
     >
       <input
         name="searchedVideo"
-        class="w-[300px]"
+        class="w-[250px]"
         type="search"
-        placeholder="Search on imdb..."
+        placeholder="Search on movie database..."
       />
       <button class="variant-filled-primary"><Search /></button>
     </div>
@@ -96,4 +96,3 @@
     <div class="h-[42px]" />
   {/if}
 </div>
-movieDBUrlmovieDBUrl
