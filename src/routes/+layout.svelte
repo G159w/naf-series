@@ -71,7 +71,7 @@
     <AppBar>
       <svelte:fragment slot="lead">
         <a href="/" class="pl-10 text-xl uppercase text-red-600 font-bold">
-          <img src="nafseries_netflix.png" class=" w-36" />
+          <img alt="NafSeries" src="nafseries.gif" class=" w-36" />
         </a>
       </svelte:fragment>
       <svelte:fragment slot="trail">

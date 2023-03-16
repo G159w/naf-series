@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Star } from "lucide-svelte";
+  import { Star, User } from "lucide-svelte";
   import { fade, scale } from "svelte/transition";
   import { Drawer, drawerStore } from "@skeletonlabs/skeleton";
   import type { Personality, Video, Genre } from "@prisma/client";
@@ -57,10 +57,10 @@
           </div>
         {/if}
         {#if video.creators.length}
-          <div in:fade={{ delay: 250 }}>
+          <div class="flex flex-row gap-2" in:fade={{ delay: 250 }}>
             <span class="font-bold"> Créateurs : </span>
             {#each video.creators as creator}
-              <div>{creator.name}</div>
+              <a>{creator.name}</a>
             {/each}
           </div>
         {/if}
@@ -71,15 +71,23 @@
       <span class="font-bold"> Acteurs : </span>
       <div class="flex flex-row flex-wrap rounded-2xl gap-8 mt-2">
         {#each video.stars as star, i}
-          <div
+          <button
             in:scale={{ delay: i * 25 }}
-            class="flex flex-col bg-surface-700 rounded-xl w-28 align-middle"
+            class=" shadow-md card-hover flex flex-col bg-surface-700 rounded-xl w-28 align-middle items-center"
           >
-            <img class="rounded-t-2xl w-full" src={star.imgUrl} />
-            <span class="p-2 text-center w-full font-bold">
+            {#if star.imgUrl}
+              <img
+                alt={star.name}
+                class="rounded-t-2xl w-full"
+                src={star.imgUrl}
+              />
+            {:else}
+              <User class="w-full rounded-t-2xl  h-[142px] bg-surface-100 text-surface-700" />
+            {/if}
+            <span class="p-2 text-center w-full font-bold ">
               {star.name}
             </span>
-          </div>
+          </button>
         {/each}
       </div>
     </div>

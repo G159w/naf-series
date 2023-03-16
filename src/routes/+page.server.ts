@@ -5,18 +5,82 @@ import prisma from "$lib/server/prismadb"
 import * as cheerio from 'cheerio';
 import type { movieDBVideo } from '$lib/types';
 
-import type { VideoType } from '@prisma/client';
+import { VideoType, type Video, type Personality, type Genre } from '@prisma/client';
+
+type FullVideo = Video & {
+	creators: Personality[];
+	stars: Personality[];
+	genres: Genre[];
+};
+
+type filters = keyof Pick<FullVideo, 'creators' | 'title' | 'stars'>
 
 
-export const load = (async () => {
+const stringToEnum = <T>(str: string | null | undefined, type: T): keyof T | undefined => {
+	if (!str) return undefined
+	for (let enumMember in type) {
+		if (str.toLowerCase() === enumMember.toString().toLowerCase()) {
+			return enumMember;
+		}
+ }
+ return undefined
+}
+
+export const load = (async ({ url }) => {
+	const textSearch = url.searchParams.get('textSearch') || '';
+	const searchType = url.searchParams.get('searchType') || 'title' as filters ;
+	const videoType = stringToEnum(url.searchParams.get('videoType'), VideoType)
+	const genre = url.searchParams.get('genre') || ''
+
 	const videos = await prisma.video.findMany({
+		where:{
+			title: searchType === 'title' ? {
+				contains: textSearch,
+				mode: 'insensitive'
+			} : undefined,
+			creators: searchType === 'creators' ? {
+				some: {
+					name: {
+						contains: textSearch,
+						mode: 'insensitive'
+					}
+				}
+			}: undefined,
+			stars: searchType === 'stars' ? {
+				some: {
+					name: {
+						contains: textSearch,
+						mode: 'insensitive'
+					}
+				}
+			}: undefined,
+			genres: {
+				some: {
+					name: {
+						contains: genre,
+						mode: 'insensitive'
+					}
+				}
+			},
+			type: videoType ? {
+				equals: videoType,
+			} : undefined,
+		},
+		orderBy: {
+			year: 'desc',
+		},
 		include: {
 			creators: true,
 			stars: true,
 			genres: true,
 		}
 	});
-	return { videos };
+	const genres = await prisma.genre.findMany({
+		orderBy: {
+			name: 'asc',
+		},
+	});
+	return { videos, genres };
 }) satisfies PageServerLoad;
 
 const fetchImdbVideosSchema = z.object({
@@ -104,7 +168,7 @@ export const actions: Actions = {
 				const img = cheerioApi(el).find('img').attr('src');
 				return {
 					name: cheerioApi(el).find('.character').prev().text().trim(),
-					imgUrl: `${scrappedSite}${img}`
+					imgUrl: img ? `${scrappedSite}${img}` : undefined
 				}
 			}).toArray();
 			const videoType = cheerioApi('.movie_wrap').length ? 'Movie' : 'Series';
