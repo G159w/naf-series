@@ -7,12 +7,30 @@
     type PopupSettings,
   } from "@skeletonlabs/skeleton";
   import type { Genre } from "@prisma/client";
+  import { page } from "$app/stores";
 
   export let genres: Genre[];
 
-  let videoType: keyof typeof videoComboValues | undefined = undefined;
-  let searchType: keyof typeof searchTypeComboValues = "title";
-  let genre: Genre | undefined = undefined;
+  let videoType: keyof typeof videoComboValues | undefined = (() => {
+    const type = $page.url.searchParams.get("videoType")?.toLowerCase();
+    if (!type || (type !== "movies" && type !== "series")) {
+      return undefined;
+    }
+    return type;
+  })();
+
+  let searchType: keyof typeof searchTypeComboValues = (() => {
+    const type = $page.url.searchParams.get("searchType")?.toLowerCase();
+    if (!type || (type !== "title" && type !== "actor" && type !== "actor")) {
+      return 'title';
+    }
+    return type;
+  })();
+
+  let genre: Genre | undefined = (() => {
+    const paramGenre = $page.url.searchParams.get("genre")?.toLowerCase();
+    return genres.find((genre) => genre.name.toLowerCase() === paramGenre)
+  })();;
 
   const videoComboValues = {
     series: "Séries",
@@ -43,7 +61,7 @@
   data-popup="comboVideoType"
 >
   <ListBox rounded="rounded-none">
-		<ListBoxItem bind:group={videoType} name={"Nothing"} value={undefined}>
+    <ListBoxItem bind:group={videoType} name={"Nothing"} value={undefined}>
       Tout
     </ListBoxItem>
     {#each Object.entries(videoComboValues) as [key, value]}
@@ -88,19 +106,19 @@
     {searchTypeComboValues[searchType]}
   </button>
   <input class="w-[300px]" type="search" placeholder="Recherche ..." />
-	<span class="divider-vertical h-full" />
+  <span class="divider-vertical h-full" />
   <button
     class={` ghost-filled w-28 p-2 ${genre ? "" : " text-surface-400"}`}
     use:popup={genreComboBox}
   >
     {genre?.name || "Genre ..."}
   </button>
-	<span class="divider-vertical h-full" />
+  <span class="divider-vertical h-full" />
   <button
     class={` ghost-filled w-24 p-2 ${videoType ? "" : " text-surface-400"}`}
     use:popup={videoCombobox}
   >
-    {videoType ? videoComboValues[videoType] : 'Type ...'}
+    {videoType ? videoComboValues[videoType] : "Type ..."}
   </button>
   <button class="variant-filled-primary"><Search /></button>
 </div>
