@@ -27,7 +27,7 @@ const stringToEnum = <T>(str: string | null | undefined, type: T): keyof T | und
 }
 
 export const load = (async ({ url }) => {
-	const textSearch = url.searchParams.get('textSearch') || '';
+	const searchText = url.searchParams.get('searchText') || '';
 	const searchType = url.searchParams.get('searchType') || 'title' as filters ;
 	const videoType = stringToEnum(url.searchParams.get('videoType'), VideoType)
 	const genre = url.searchParams.get('genre') || ''
@@ -35,13 +35,13 @@ export const load = (async ({ url }) => {
 	const videos = await prisma.video.findMany({
 		where:{
 			title: searchType === 'title' ? {
-				contains: textSearch,
+				contains: searchText,
 				mode: 'insensitive'
 			} : undefined,
 			creators: searchType === 'creators' ? {
 				some: {
 					name: {
-						contains: textSearch,
+						contains: searchText,
 						mode: 'insensitive'
 					}
 				}
@@ -49,19 +49,18 @@ export const load = (async ({ url }) => {
 			stars: searchType === 'stars' ? {
 				some: {
 					name: {
-						contains: textSearch,
+						contains: searchText,
 						mode: 'insensitive'
 					}
 				}
 			}: undefined,
-			genres: {
+			genres: genre ? {
 				some: {
-					name: {
-						contains: genre,
-						mode: 'insensitive'
+					id: {
+						equals: genre
 					}
 				}
-			},
+			} : undefined,
 			type: videoType ? {
 				equals: videoType,
 			} : undefined,

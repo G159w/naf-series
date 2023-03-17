@@ -15,7 +15,7 @@
     <SearchMovie genres={data.genres} />
   </div>
   <div class="flex flex-row flex-wrap gap-8 justify-center">
-    {#each data.videos as video, i}
+    {#each data.videos as video, i (video.id)}
       <div in:fade={{ delay: i * 25 }}>
         <MovieCard {video} />
       </div>

@@ -8,29 +8,49 @@
   } from "@skeletonlabs/skeleton";
   import type { Genre } from "@prisma/client";
   import { page } from "$app/stores";
+  import { afterNavigate, goto } from "$app/navigation";
+  import { enhance } from "$app/forms";
 
   export let genres: Genre[];
 
-  let videoType: keyof typeof videoComboValues | undefined = (() => {
+  const getUrlVideoType = () => {
     const type = $page.url.searchParams.get("videoType")?.toLowerCase();
     if (!type || (type !== "movies" && type !== "series")) {
       return undefined;
     }
     return type;
-  })();
+  }
+  let videoType: keyof typeof videoComboValues | undefined = getUrlVideoType();
 
-  let searchType: keyof typeof searchTypeComboValues = (() => {
+  const getUrlSearchType = () => {
     const type = $page.url.searchParams.get("searchType")?.toLowerCase();
-    if (!type || (type !== "title" && type !== "actor" && type !== "actor")) {
-      return 'title';
+    if (
+      !type ||
+      (type !== "title" && type !== "stars" && type !== "creators")
+    ) {
+      return "title";
     }
     return type;
-  })();
+  }
+  let searchType: keyof typeof searchTypeComboValues = getUrlSearchType();
 
-  let genre: Genre | undefined = (() => {
+  const getUrlGenre = () => {
     const paramGenre = $page.url.searchParams.get("genre")?.toLowerCase();
-    return genres.find((genre) => genre.name.toLowerCase() === paramGenre)
-  })();;
+    return genres.find((genre) => genre.id === paramGenre);
+  }
+  let genre: Genre | undefined = getUrlGenre();
+
+  const gerUrlSearchText = () => {
+    return $page.url.searchParams.get("searchText") || "";
+  }
+  let searchText: string = gerUrlSearchText();
+
+  afterNavigate(() => {
+    genre = getUrlGenre();
+    searchText = gerUrlSearchText()
+    searchType = getUrlSearchType()
+    videoType = getUrlVideoType()
+  });
 
   const videoComboValues = {
     series: "Séries",
@@ -39,8 +59,8 @@
 
   const searchTypeComboValues = {
     title: "Titre",
-    actor: "Acteur",
-    creator: "Créateur",
+    stars: "Acteur",
+    creators: "Créateur",
   };
 
   const createComboBoxSettings = (name: string): PopupSettings => {
@@ -101,24 +121,60 @@
   <div class="arrow bg-surface-100-800-token" />
 </div>
 
-<div class="flex flex-row input-group input-group-divider w-fit h-12">
-  <button class=" ghost-filled w-24" use:popup={searchTypeCombobox}>
-    {searchTypeComboValues[searchType]}
-  </button>
-  <input class="w-[300px]" type="search" placeholder="Recherche ..." />
-  <span class="divider-vertical h-full" />
-  <button
-    class={` ghost-filled w-28 p-2 ${genre ? "" : " text-surface-400"}`}
-    use:popup={genreComboBox}
-  >
-    {genre?.name || "Genre ..."}
-  </button>
-  <span class="divider-vertical h-full" />
-  <button
-    class={` ghost-filled w-24 p-2 ${videoType ? "" : " text-surface-400"}`}
-    use:popup={videoCombobox}
-  >
-    {videoType ? videoComboValues[videoType] : "Type ..."}
-  </button>
-  <button class="variant-filled-primary"><Search /></button>
-</div>
+<form>
+  <div class="flex flex-row input-group input-group-divider w-fit h-12">
+    <button
+      type="button"
+      class=" ghost-filled w-24"
+      use:popup={searchTypeCombobox}
+    >
+      {searchTypeComboValues[searchType]}
+    </button>
+    <input
+      bind:value={searchText}
+      class="w-[300px]"
+      type="search"
+      placeholder="Recherche ..."
+    />
+    <span class="divider-vertical h-full" />
+    <button
+      type="button"
+      class={` ghost-filled w-28 p-2 ${genre ? "" : " text-surface-400"}`}
+      use:popup={genreComboBox}
+    >
+      {genre?.name || "Genre ..."}
+    </button>
+    <span class="divider-vertical h-full" />
+    <button
+      type="button"
+      class={` ghost-filled w-24 p-2 ${videoType ? "" : " text-surface-400"}`}
+      use:popup={videoCombobox}
+    >
+      {videoType ? videoComboValues[videoType] : "Type ..."}
+    </button>
+    <button
+      type="submit"
+      class="variant-filled-primary"
+      on:click={() => {
+        const newUrl = new URL($page.url);
+        newUrl?.searchParams?.delete("searchType");
+        newUrl?.searchParams?.delete("searchText");
+        newUrl?.searchParams?.delete("genre");
+        newUrl?.searchParams?.delete("videoType");
+        if (searchType && searchType !== "title") {
+          newUrl?.searchParams?.set("searchType", searchType);
+        }
+        if (searchText) {
+          newUrl?.searchParams?.set("searchText", searchText);
+        }
+        if (genre) {
+          newUrl?.searchParams?.set("genre", genre.id);
+        }
+        if (videoType) {
+          newUrl?.searchParams?.set("videoType", videoType);
+        }
+        setTimeout(() => goto(newUrl), 0);
+      }}><Search /></button
+    >
+  </div>
+</form>
