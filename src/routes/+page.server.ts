@@ -2,18 +2,19 @@ import type { PageServerLoad, Actions } from './$types';
 import { z } from 'zod';
 import { Timer } from 'timer-node';
 import prisma from "$lib/server/prismadb"
-import * as cheerio from 'cheerio';
-import type { movieDBVideo } from '$lib/types';
+import type { DBMovieMovies, DBMovieSeries, DBMovieMoviesDetail, DBMovieSeriesDetail } from '$lib/types';
 
 import { VideoType, type Video, type Personality, type Genre } from '@prisma/client';
+import { getUserSession, } from '$lib/server/utils';
+import { MOVIE_DB_KEY } from '$env/static/private';
 
 type FullVideo = Video & {
 	creators: Personality[];
-	stars: Personality[];
+	actors: Personality[];
 	genres: Genre[];
 };
 
-type filters = keyof Pick<FullVideo, 'creators' | 'title' | 'stars'>
+type filters = keyof Pick<FullVideo, 'creators' | 'title' | 'actors'>
 
 
 const stringToEnum = <T>(str: string | null | undefined, type: T): keyof T | undefined => {
@@ -34,10 +35,20 @@ export const load = (async ({ url }) => {
 
 	const videos = await prisma.video.findMany({
 		where:{
-			title: searchType === 'title' ? {
-				contains: searchText,
-				mode: 'insensitive'
-			} : undefined,
+			OR: searchType === 'title' ? [
+				{
+					title: {
+						contains: searchText,
+						mode: 'insensitive'
+					} 
+				},
+				{
+					originalTitle: {
+						contains: searchText,
+						mode: 'insensitive'
+					}
+				} 
+			] : undefined,
 			creators: searchType === 'creators' ? {
 				some: {
 					name: {
@@ -46,7 +57,7 @@ export const load = (async ({ url }) => {
 					}
 				}
 			}: undefined,
-			stars: searchType === 'stars' ? {
+			actors: searchType === 'actors' ? {
 				some: {
 					name: {
 						contains: searchText,
@@ -66,12 +77,29 @@ export const load = (async ({ url }) => {
 			} : undefined,
 		},
 		orderBy: {
-			year: 'desc',
+			releaseDate: 'desc',
 		},
 		include: {
-			creators: true,
-			stars: true,
-			genres: true,
+			creators: {
+				orderBy: {
+					popularity: 'desc'
+				}
+			},
+			actors: true,
+			genres: {
+				orderBy: {
+					name: 'asc'
+				}
+			},
+			comments: {
+				include: {
+					user: true,
+				},
+				orderBy: {
+					createdAt: 'asc'
+				}
+			},
+			ratings: true
 		}
 	});
 	const genres = await prisma.genre.findMany({
@@ -86,125 +114,159 @@ const fetchImdbVideosSchema = z.object({
 	searchedVideo: z.string(),
 });
 
-const addImdbVideosSchema = z.object({
-	imdbUrl: z.string(),
+const addMovieDbVideosSchema = z.object({
+	type: z.string(),
+	movieDbId: z.string(),
 });
 
-const getOnlyDigit = (str: string) => {
-	return str.match(/\d/g)?.join("") || '';
-}
+const createCommentSchema = z.object({
+	videoId: z.string(),
+	content: z.string(),
+});
 
-const scrappedSite = 'https://www.themoviedb.org';
-const getVideos = (html: string, videoType: VideoType) => {
-	const cheerioApi = cheerio.load(html);
+const updateCommentSchema = z.object({
+	videoId: z.string(),
+	commentId: z.string(),
+	content: z.string(),
+});
 
-	const cheerioVideos = cheerioApi(`${videoType === 'Movie' ? '.movie' : '.tv'} .card`)
-	const imdbVideos: movieDBVideo[] = []
-	cheerioVideos.map((i, el) => {
-		if (i < 6) {
-			const cheerioVideo = cheerio.load(el)
-			const imgUrl = scrappedSite + cheerioVideo('img').attr('src');
-			const title = cheerioVideo('.details a').text() || '';
-			const imdbUrl = cheerioVideo('.details a').attr('href');
-			const year = cheerioVideo('.release_date').first().text();
+const deleteCommentSchema = z.object({
+	videoId: z.string(),
+	commentId: z.string(),
+});
 
-			imdbVideos.push({
-				title,
-				movieDBUrl: imdbUrl || '',
-				imgUrl,
-				year,
-				type: videoType
-			})
-		}
-	})
-	return imdbVideos;
+type DBMovieApiResult<T> = {
+	page: number;
+	results: T[]
 }
 
 export const actions: Actions = {
-	fetchImdbVideos: async ({ request }) => {
+	fetchMovieDB: async ({ request, locals }) => {
+		await getUserSession(locals)
 		const timer = new Timer();
 		timer.start();
 		try {
-			const formaData = Object.fromEntries(await request.formData());
-			const { searchedVideo } = fetchImdbVideosSchema.parse(formaData);
+			const formData = Object.fromEntries(await request.formData());
+			const { searchedVideo } = fetchImdbVideosSchema.parse(formData);
 			console.log(timer.time(), searchedVideo);
-			const response = await fetch(`${scrappedSite}/search?query=${searchedVideo}`);
-			const body = await response.text();
-			const imdbVideos = [...getVideos(body, 'Movie'), ...getVideos(body, 'Series')];
-			console.log(timer.time(), "imdb found videos", imdbVideos.length);
-			return imdbVideos
+			
+			const moviesResponse = await fetch(`https://api.themoviedb.org/3/search/movie?query=${searchedVideo}&language=fr-FR`, {
+				headers: {
+					Authorization: `Bearer ${MOVIE_DB_KEY}`
+				}
+			});
+			const seriesResponse = await fetch(`https://api.themoviedb.org/3/search/tv?query=${searchedVideo}&language=fr-FR`, {
+				headers: {
+					Authorization: `Bearer ${MOVIE_DB_KEY}`
+				}
+			});
+
+			const { results: seriesVideos } = await seriesResponse.json() as DBMovieApiResult<DBMovieMovies>
+			const { results: moviesVideos } = await moviesResponse.json() as DBMovieApiResult<DBMovieSeries>
+			
+			console.log(timer.time(), "movies db found videos", seriesVideos.length + moviesVideos.length);
+			return { series: seriesVideos.slice(0, 5), movies: moviesVideos.slice(0, 5)}
 		} catch (error) {
 			console.log(timer.time(), error);
 			return "KO"
 		}
 	},
-	addImbdbVideo: async ({ request }) => {
+	addMovieDbVideo: async ({ request, locals }) => {
+		await getUserSession(locals)
 		const timer = new Timer();
 		timer.start();
 		try {
 			const formaData = Object.fromEntries(await request.formData());
-			const { imdbUrl } = addImdbVideosSchema.parse(formaData);
-			const completeUrl = `${scrappedSite}${imdbUrl}`
-			console.log(timer.time(), completeUrl);
-
-			const response = await fetch(completeUrl);
-			const body = await response.text();
-			const cheerioApi = cheerio.load(body);
-
-			const desc = cheerioApi('.tagline').text().trim();
-			const storyline = cheerioApi('.overview').text().trim();
-			const usersRating = cheerioApi('.user_score_chart').first().attr('data-percent');
-			const title = cheerioApi('h2 > a').first().text().trim();
-			const imgUrl = scrappedSite + cheerioApi('.image_content .poster').attr('data-srcset')?.split(',').pop()?.replace(/ /g, '')?.slice(0, -2);
-			const genres = cheerioApi('.genres a').map((i, el) => {
-				return cheerioApi(el).text().trim()
-			}).toArray();
-			const year = +getOnlyDigit(cheerioApi('.release_date').first().text());
-			const creators = cheerioApi('.profile a').map((i, el) => {
-				return cheerioApi(el).text().trim()
-			}).toArray();
-			const actors = cheerioApi('.people .card').map((i, el) => {
-				const img = cheerioApi(el).find('img').attr('src');
-				return {
-					name: cheerioApi(el).find('.character').prev().text().trim(),
-					imgUrl: img ? `${scrappedSite}${img}` : undefined
+			const { movieDbId, type } = addMovieDbVideosSchema.parse(formaData);
+			console.log(movieDbId);
+			const moviesResponse = await fetch(
+				`https://api.themoviedb.org/3/${type === 'movie' ? 'movie' : 'tv'}/${movieDbId}?&language=fr-FR&append_to_response=${type === 'movie' ? 'credits' : 'aggregate_credits'}`, 
+				{
+					headers: {
+						Authorization: `Bearer ${MOVIE_DB_KEY}`
+					}
 				}
-			}).toArray();
-			const videoType = cheerioApi('.movie_wrap').length ? 'Movie' : 'Series';
+			);
 
+			const response = await moviesResponse.json();
+			console.log(response)
+			let data: DBMovieMoviesDetail & {
+				title: string;
+				type: VideoType;
+
+			}
+			if (type === 'movie') {
+				const movieDbMovie = response as DBMovieMoviesDetail;
+				data = {
+					...movieDbMovie,
+					credits: {
+						cast: movieDbMovie.credits.cast.sort((a, b) => a.order - b.order).slice(0, 9),
+						crew: movieDbMovie.credits.crew.filter(c =>  ['Directing', 'Writing'].includes(c.department)).sort((a, b) => b.popularity - a.popularity).slice(0, 5),
+					},
+					type: VideoType.Movie,
+				}
+			} else {
+				const movieDbSeries = response as DBMovieSeriesDetail;
+				data = {
+					...movieDbSeries,
+					title: movieDbSeries.name,
+					original_title: movieDbSeries.original_name,
+					type: VideoType.Series,
+					release_date: movieDbSeries.first_air_date,
+					credits: {
+						cast: movieDbSeries.aggregate_credits.cast.sort((a, b) => a.order - b.order).slice(0, 9),
+						crew: movieDbSeries.aggregate_credits.crew.filter(c =>  ['Directing', 'Writing'].includes(c.department)).sort((a, b) => b.popularity - a.popularity).slice(0, 5),
+					},
+					budget: undefined,
+					revenue: undefined,
+				}
+			}
+			
 			const video = await prisma.video.upsert({
 				where: {
-					title_type: {
-						title,
-						type: videoType
+					title_releaseDate: {
+						title: data.title,
+						releaseDate: new Date(data.release_date)
 					}
 				},
 				create: {
-					title,
-					type: videoType,
-					imageUrl: imgUrl,
-					year,
-					usersRating: usersRating ? +usersRating : null,
-					storyline,
-					desc,
+					adult: data.adult,
+					backdropPath: data.backdrop_path,
+					posterPath: data.poster_path,
+					tagline: data.tagline,
+					overview: data.overview,
+					title: data.title,
+					revenue: data.revenue, 
+					status: data.status,
+					budget: data.budget,
+					originalTitle: data.original_title,
+					originalLanguage: data.original_language,
+					releaseDate: new Date(data.release_date),
+					popularity: data.popularity,
+					imdbId: data.imdb_id,
+
 					creators: {
-						connectOrCreate: creators.map((creator) => ({
-							where: { name: creator },
-							create: { name: creator }
+						connectOrCreate: data.credits.crew.map((creator) => ({
+							where: { name: creator.name },
+							create: { name: creator.name, imgUrl: creator.profile_path, popularity: creator.popularity }
 						}))
 					},
-					stars: {
-						connectOrCreate: actors.map((actor) => ({
+					actors: {
+						connectOrCreate: data.credits.cast.map((actor) => ({
 							where: { name: actor.name },
-							create: { name: actor.name, imgUrl: actor.imgUrl }
+							create: { name: actor.name, imgUrl: actor.profile_path, popularity: actor.popularity }
 						}))
 					},
 					genres: {
-						connectOrCreate: genres.map((genre) => ({
-							where: { name: genre },
-							create: { name: genre }
+						connectOrCreate: data.genres.map((genre) => ({
+							where: { name: genre.name },
+							create: { name: genre.name }
 						}))
-					}
+					},
+
+					type: data.type,
+					voteAverage: data.vote_average,
+					voteCount: data.vote_count,
 				},
 				update: {}
 			})
@@ -213,5 +275,62 @@ export const actions: Actions = {
 			console.log(timer.time(), error);
 			return "KO"
 		}
-	}
+	},
+	createComment: async ({ request, locals, fetch }) => {
+		await getUserSession(locals)
+		const timer = new Timer();
+		timer.start();
+		try {
+			const formData = Object.fromEntries(await request.formData());
+			const { content, videoId } = createCommentSchema.parse(formData);
+			
+			const result = await fetch(`/videos/${videoId}/comments`, {
+				method: 'POST',
+				body: JSON.stringify({ content })
+			})
+			const comment = await result.json()
+			console.log(timer.time(), comment);
+			return comment;
+		} catch (error) {
+			console.log(timer.time(), error);
+			return "KO"
+		}
+	},
+	deleteComment: async ({ request, locals, fetch }) => {
+		await getUserSession(locals)
+		const timer = new Timer();
+		timer.start();
+		try {
+			const formData = Object.fromEntries(await request.formData());
+			const { commentId, videoId } = deleteCommentSchema.parse(formData);
+			
+			const result = await fetch(`/videos/${videoId}/comments/${commentId}`, {
+				method: 'DELETE',
+			})
+			console.log(timer.time(), result.json());
+			return result.json();
+		} catch (error) {
+			console.log(timer.time(), error);
+			return "KO"
+		}
+	},
+	updateComment: async ({ request, locals, fetch }) => {
+		await getUserSession(locals)
+		const timer = new Timer();
+		timer.start();
+		try {
+			const formData = Object.fromEntries(await request.formData());
+			const { commentId, videoId, content } = updateCommentSchema.parse(formData);
+			
+			const result = await fetch(`/videos/${videoId}/comments/${commentId}`, {
+				method: 'PATCH',
+				body: JSON.stringify({ content })
+			})
+			console.log(timer.time(), result.json());
+			return result.json();
+		} catch (error) {
+			console.log(timer.time(), error);
+			return "KO"
+		}
+	},
 };

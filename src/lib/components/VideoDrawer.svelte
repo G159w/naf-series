@@ -1,16 +1,29 @@
 <script lang="ts">
-  import { Star, User } from "lucide-svelte";
+  import { page } from '$app/stores';
+  import { Star, User as UserIcon } from "lucide-svelte";
   import { fade, scale } from "svelte/transition";
   import { Drawer, drawerStore } from "@skeletonlabs/skeleton";
-  import type { Personality, Video, Genre } from "@prisma/client";
-  import { goto } from "$app/navigation";
-  import { page } from "$app/stores";
+  import type {
+    Personality,
+    Video,
+    Genre,
+    Rating,
+    Comment,
+    User,
+  } from "@prisma/client";
+  import { applyAction, enhance } from "$app/forms";
+  import format from "date-fns/format";
 
   $: video = $drawerStore.meta as Video & {
+    comments: (Comment & {
+      user: User;
+    })[];
+    ratings: Rating[];
     creators: Personality[];
-    stars: Personality[];
+    actors: Personality[];
     genres: Genre[];
   };
+  let comment: string = "";
 </script>
 
 {#if !video}
@@ -23,7 +36,7 @@
           in:fade={{ delay: 100 }}
           alt="movie"
           class="w-[300px] max-w-[300px] rounded-3xl "
-          src={video.imageUrl}
+          src={"https://image.tmdb.org/t/p/w500" + video.posterPath}
         />
       </div>
       <div class="flex flex-col gap-8">
@@ -32,23 +45,23 @@
           class="flex flex-row content-between justify-between items-center align-middle"
         >
           <h3 in:scale={{ delay: 125 }} class="text-red-600 font-bold">
-            {video.year}
+            {format(video.releaseDate, "MM/dd/yyyy")}
           </h3>
           <h3
             in:scale={{ delay: 150 }}
             class="flex gap-1 align-middle items-center"
           >
-            {video.usersRating}%
+            {video.voteAverage}
             <Star fill="yellow" color="yellow" size="26" />
           </h3>
         </div>
-        {#if video.desc}
+        {#if video.tagline}
           <p in:fade={{ delay: 150 }} class="font-bold italic">
-            "{video.desc}"
+            "{video.tagline}"
           </p>
         {/if}
         <p in:fade={{ delay: 200 }} class=" italic">
-          {video.storyline}
+          {video.overview}
         </p>
         {#if video.genres.length}
           <div class="flex flex-row gap-2" in:fade={{ delay: 250 }}>
@@ -79,21 +92,21 @@
     <div>
       <span class="font-bold"> Acteurs : </span>
       <div class="flex flex-row flex-wrap rounded-2xl gap-8 mt-2">
-        {#each video.stars as star, i}
+        {#each video.actors as star, i}
           <a
-            href={`/?searchType=stars&searchText=${star.name}`}
+            href={`/?searchType=actors&searchText=${star.name}`}
             on:click={drawerStore.close}
             in:scale={{ delay: i * 25 }}
-            class=" shadow-md card-hover flex flex-col bg-surface-700 rounded-xl w-28 align-middle items-center !no-underline !text-current"
+            class=" shadow-md card-hover flex flex-col bg-surface-700 rounded-xl w-24 align-middle items-center !no-underline !text-current"
           >
             {#if star.imgUrl}
               <img
                 alt={star.name}
                 class="rounded-t-2xl w-full"
-                src={star.imgUrl}
+                src={"https://image.tmdb.org/t/p/w500" + star.imgUrl}
               />
             {:else}
-              <User
+              <UserIcon
                 class="w-full rounded-t-2xl  h-[142px] bg-surface-100 text-surface-700"
               />
             {/if}
@@ -104,5 +117,54 @@
         {/each}
       </div>
     </div>
+    <div class="flex flex-col gap-4">
+      <span class="font-bold"> Commentaires ({video.comments.length}) : </span>
+      <div class="flex flex-col flex-wrap  gap-8 mt-2">
+        {#each video.comments as comment, i}
+          <div class=" bg-surface-700 p-4 flex flex-col gap-4 rounded-2xl">
+            <div class="flex flex-row gap-4">
+              <p class=" font-bold">
+                {comment.user.name}
+              </p>
+              <p class=" italic">
+                {comment.createdAt}
+              </p>
+            </div>
+            <p>
+              {comment.content}
+            </p>
+          </div>
+        {/each}
+      </div>
+    </div>
+    {#if $page.data.session}
+      <hr />
+      <form
+        class="flex flex-col gap-4 items-end"
+        method="post"
+        action="?/createComment"
+        use:enhance={({ data }) => {
+          data.append("videoId", video.id || "");
+          return async ({ result }) => {
+            if (result.type === "error") {
+              await applyAction(result);
+            } else {
+              comment = "";
+              video.comments.push(result.data);
+              video = video;
+            }
+          };
+        }}
+      >
+        <textarea
+          bind:value={comment}
+          name="content"
+          class="textarea"
+          rows="4"
+          placeholder="Donnez votre avis."
+        />
+        <button class=" btn variant-filled-primary">Envoyer</button>
+      </form>
+    {/if}
   </div>
 {/if}

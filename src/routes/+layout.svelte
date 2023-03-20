@@ -15,7 +15,6 @@
     Drawer,
     Modal,
     storePopup,
-    drawerStore,
   } from "@skeletonlabs/skeleton";
   import {
     AppShell,

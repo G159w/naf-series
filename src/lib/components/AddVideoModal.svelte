@@ -1,16 +1,15 @@
 <script lang="ts">
   import { enhance, applyAction } from "$app/forms";
-  import {  Search } from "lucide-svelte";
-  import {  modalStore } from "@skeletonlabs/skeleton";
-  import type { movieDBVideo } from "$lib/types";
+  import { Search } from "lucide-svelte";
+  import { modalStore } from "@skeletonlabs/skeleton";
+  import { isMovie, type DBMovieMovies, type DBMovieSeries } from "$lib/types";
   import { fade, scale } from "svelte/transition";
   import { VideoType } from "@prisma/client";
   import VideoSuggestion from "./VideoSuggestion.svelte";
 
-  let movieDBVideos = new Array<movieDBVideo>();
-  $: movies = movieDBVideos.filter((v) => v.type === VideoType.Movie);
-  $: series = movieDBVideos.filter((v) => v.type === VideoType.Series);
-  let selectedMovieDBVideo: movieDBVideo | undefined;
+  let movies = new Array<DBMovieMovies>();
+  let series = new Array<DBMovieSeries>();
+  let selectedMovieDBVideo: DBMovieMovies | DBMovieSeries | undefined;
 </script>
 
 <div
@@ -25,12 +24,12 @@
           await applyAction(result);
         } else {
           selectedMovieDBVideo = undefined;
-          movieDBVideos = result.data;
-          console.log(movieDBVideos);
+          movies = result.data.movies;
+          series = result.data.series;
         }
       };
     }}
-    action="?/fetchImdbVideos"
+    action="?/fetchMovieDB"
   >
     <div
       class="input-group input-group-divider grid-cols-[auto_1fr_auto] w-fit h-12"
@@ -49,7 +48,7 @@
       <div class="flex flex-col gap-4 ali w-full">
         <h3 in:fade>Films</h3>
         <div class="flex flex-row gap-4 flex-wrap w-full">
-          {#each movies as video, i (video.movieDBUrl)}
+          {#each movies as video, i (video.id)}
             <div in:scale={{ delay: i * 25 }} class="w-full">
               <VideoSuggestion
                 {video}
@@ -65,7 +64,7 @@
       <div class="flex flex-col gap-4 ali w-full">
         <h3>Séries</h3>
         <div class="flex flex-row gap-4 flex-wrap w-full">
-          {#each series as video, i (video.movieDBUrl)}
+          {#each series as video, i (video.id)}
             <div in:scale={{ delay: i * 25 }} class="w-full">
               <VideoSuggestion
                 {video}
@@ -84,10 +83,12 @@
         class="flex w-full justify-end"
         method="POST"
         use:enhance={({ data }) => {
-          data.append("imdbUrl", selectedMovieDBVideo?.movieDBUrl || "");
+          if (!selectedMovieDBVideo) return;
+          data.append("type", isMovie(selectedMovieDBVideo) ? 'movie' : 'series');
+          data.append("movieDbId", selectedMovieDBVideo.id.toString());
           modalStore.close();
         }}
-        action="?/addImbdbVideo"
+        action="?/addMovieDbVideo"
       >
         <button class="btn variant-filled-primary ">Valider</button>
       </form>

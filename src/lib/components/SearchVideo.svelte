@@ -93,7 +93,7 @@
   <div class="arrow bg-surface-100-800-token" />
 </div>
 
-<div class="card w-48 shadow-xl rounded-md py-2" data-popup="comboSearchType">
+<div class="card w-48 shadow-xl rounded-md py-2 z-[999]" data-popup="comboSearchType">
   <ListBox rounded="rounded-none">
     {#each Object.entries(searchTypeComboValues) as [key, value]}
       <ListBoxItem bind:group={searchType} name={key} value={key}>
@@ -121,7 +121,7 @@
   <div class="arrow bg-surface-100-800-token" />
 </div>
 
-<form>
+<form class="shadow-lg">
   <div class="flex flex-row input-group input-group-divider w-fit h-12">
     <button
       type="button"

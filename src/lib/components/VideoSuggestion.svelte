@@ -1,11 +1,16 @@
 <script lang="ts">
   import { Film } from "lucide-svelte";
-  import type { movieDBVideo } from "$lib/types";
+  import { isMovie, type DBMovieMovies, type DBMovieSeries } from "$lib/types";
 
 
-  export let video: movieDBVideo;
+  export let video: DBMovieMovies | DBMovieSeries ;
   export let onClick: () => void;
   export let isSelected: boolean;
+
+
+  $: name = isMovie(video) ? video.title : video.name;
+  $: year = isMovie(video) ? video.release_date : video.first_air_date;
+  console.log(video.poster_path);
 </script>
 
 <button
@@ -14,8 +19,8 @@
   } `}
   on:click={onClick}
 >
-  {#if video.imgUrl}
-    <img alt={video.title} class="h-[75px]  rounded-lg" src={video.imgUrl} />
+  {#if video.poster_path}
+    <img alt={name} class="h-[75px]  rounded-lg" src={'https://image.tmdb.org/t/p/w500' + video.poster_path} />
   {:else}
     <div
       class="w-[50px] h-[75px] flex items-center align-middle justify-center flex-col bg-surface-200 rounded-lg"
@@ -25,11 +30,11 @@
   {/if}
   <div class="flex flex-col h-[75px] items-start text-left gap-1 p-1 pr-2">
     <div class="font-bold line-clamp-2 leading-tight">
-      {video.title}
+      {name}
     </div>
-    {#if video.year}
+    {#if year}
       <div class=" font-light">
-        {video.year}
+        {year}
       </div>
     {/if}
   </div>

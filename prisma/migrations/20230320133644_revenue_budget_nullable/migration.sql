@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Video" ALTER COLUMN "budget" DROP NOT NULL;
+ALTER TABLE "Video" ALTER COLUMN "revenue" DROP NOT NULL;
