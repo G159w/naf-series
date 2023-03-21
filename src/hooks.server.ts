@@ -8,6 +8,7 @@ import prisma from "$lib/server/prismadb"
 import type { Adapter } from "@auth/core/adapters"
 
 export const handle = SvelteKitAuth({
+  trustHost: true,
   adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     Google({ clientId: GOOGLE_ID, clientSecret: GOOGLE_SECRET }) as OAuth2Config<Profile>,

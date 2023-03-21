@@ -189,7 +189,6 @@ export const actions: Actions = {
 			);
 
 			const response = await moviesResponse.json();
-			console.log(response)
 			let data: DBMovieMoviesDetail & {
 				title: string;
 				type: VideoType;

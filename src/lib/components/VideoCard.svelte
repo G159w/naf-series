@@ -4,7 +4,7 @@
   import { Star } from "lucide-svelte";
   import type { DrawerSettings } from "@skeletonlabs/skeleton";
   import { scale } from "svelte/transition";
-  import format from "date-fns/format";
+  import { format } from "date-fns";
 
   export let video: Video & {
     creators: Personality[];

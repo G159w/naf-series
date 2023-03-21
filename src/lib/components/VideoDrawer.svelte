@@ -12,7 +12,7 @@
     User,
   } from "@prisma/client";
   import { applyAction, enhance } from "$app/forms";
-  import format from "date-fns/format";
+  import { format } from "date-fns";
 
   $: video = $drawerStore.meta as Video & {
     comments: (Comment & {
