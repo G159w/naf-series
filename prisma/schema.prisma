@@ -37,16 +37,15 @@ model Session {
 }
 
 model User {
-  id            String              @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?             @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
   comments      Comment[]
   ratings       Rating[]
-  videosSeen    UserHaveSeenVideo[]
 }
 
 model VerificationToken {
@@ -63,7 +62,7 @@ model Personality {
   popularity Float
   imgUrl     String?
   created    Video[] @relation("createdVideos")
-  starred    Video[] @relation("starredVideos")
+  roles      Role[]
 }
 
 model Genre {
@@ -99,14 +98,13 @@ model Video {
   imdbId           String?
   popularity       Float
 
-  creators Personality[] @relation("createdVideos")
-  actors   Personality[] @relation("starredVideos")
-  genres   Genre[]       @relation("videoGenres")
+  creators   Personality[] @relation("createdVideos")
+  characters Role[]
+  genres     Genre[]       @relation("videoGenres")
 
-  comments     Comment[]
-  ratings      Rating[]
-  usersHasSeen UserHaveSeenVideo[]
-  type         VideoType
+  comments Comment[]
+  ratings  Rating[]
+  type     VideoType
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -138,15 +136,17 @@ model Rating {
   @@unique([userId, videoId])
 }
 
-model UserHaveSeenVideo {
-  id        String   @id @default(cuid())
-  hasSeen   Boolean
-  video     Video    @relation(fields: [videoId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
+model Role {
+  id        String      @id @default(cuid())
+  order     Int
+  character String
+  video     Video       @relation(fields: [videoId], references: [id])
+  actor     Personality @relation(fields: [actorId], references: [id])
+  actorId   String
   videoId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
-  @@unique([userId, videoId])
+  @@unique([actorId, videoId])
+  @@unique([order, character])
 }

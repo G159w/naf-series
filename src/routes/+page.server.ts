@@ -8,13 +8,7 @@ import { VideoType, type Video, type Personality, type Genre } from '@prisma/cli
 import { getUserSession, } from '$lib/server/utils';
 import { MOVIE_DB_KEY } from '$env/static/private';
 
-type FullVideo = Video & {
-	creators: Personality[];
-	actors: Personality[];
-	genres: Genre[];
-};
-
-type filters = keyof Pick<FullVideo, 'creators' | 'title' | 'actors'>
+type filters = 'creators' | 'title' | 'actors'
 
 const stringToEnum = <T>(str: string | null | undefined, type: T): keyof T | undefined => {
 	if (!str) return undefined
@@ -87,11 +81,13 @@ export const load = (async ({ url, locals }) => {
 					}
 				}
 			}: undefined,
-			actors: searchType === 'actors' ? {
+			characters: searchType === 'actors' ? {
 				some: {
-					name: {
-						contains: searchText,
-						mode: 'insensitive'
+					actor: {
+						name: {
+							contains: searchText,
+							mode: 'insensitive'
+						}
 					}
 				}
 			}: undefined,
@@ -115,7 +111,15 @@ export const load = (async ({ url, locals }) => {
 					popularity: 'desc'
 				}
 			},
-			actors: true,
+			characters: {
+				take: 9,
+				orderBy: {
+					order: 'asc'
+				},
+				include: {
+					actor: true,
+				}
+			},
 			genres: {
 				orderBy: {
 					name: 'asc'
@@ -216,7 +220,7 @@ export const actions: Actions = {
 				data = {
 					...movieDbMovie,
 					credits: {
-						cast: movieDbMovie.credits.cast.sort((a, b) => a.order - b.order).slice(0, 9),
+						cast: movieDbMovie.credits.cast.sort((a, b) => a.order - b.order).slice(0, 15),
 						crew: movieDbMovie.credits.crew.filter(c =>  ['Directing', 'Writing'].includes(c.department)).sort((a, b) => b.popularity - a.popularity).slice(0, 5),
 					},
 					type: VideoType.Movie,
@@ -230,7 +234,7 @@ export const actions: Actions = {
 					type: VideoType.Series,
 					release_date: movieDbSeries.first_air_date,
 					credits: {
-						cast: movieDbSeries.aggregate_credits.cast.sort((a, b) => a.order - b.order).slice(0, 9),
+						cast: movieDbSeries.aggregate_credits.cast.sort((a, b) => a.order - b.order).slice(0, 15).map((actor) => ({ ...actor, character: actor.roles[0].character })),
 						crew: movieDbSeries.aggregate_credits.crew.filter(c =>  ['Directing', 'Writing'].includes(c.department)).sort((a, b) => b.popularity - a.popularity).slice(0, 5),
 					},
 					budget: undefined,
@@ -267,10 +271,28 @@ export const actions: Actions = {
 							create: { name: creator.name, imgUrl: creator.profile_path, popularity: creator.popularity }
 						}))
 					},
-					actors: {
+					characters: {
 						connectOrCreate: data.credits.cast.map((actor) => ({
-							where: { name: actor.name },
-							create: { name: actor.name, imgUrl: actor.profile_path, popularity: actor.popularity }
+							where: { 
+								order_character: {
+									order: actor.order,
+									character: actor.character
+								}
+							},
+							create: { 
+								character: actor.character,
+								order: actor.order,
+								actor: {
+									connectOrCreate: {
+										where: { name: actor.name},
+										create: {
+											name: actor.name,
+											imgUrl: actor.profile_path,
+											popularity: actor.popularity,
+										}
+									}
+								}
+							 }
 						}))
 					},
 					genres: {

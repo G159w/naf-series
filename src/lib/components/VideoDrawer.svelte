@@ -10,6 +10,7 @@
     Rating,
     Comment,
     User,
+    Role,
   } from "@prisma/client";
   import { applyAction, deserialize, enhance } from "$app/forms";
   import { format } from "date-fns";
@@ -22,7 +23,9 @@
     })[];
     ratings: Rating[];
     creators: Personality[];
-    actors: Personality[];
+    characters: (Role & {
+      actor: Personality;
+    })[];
     genres: Genre[];
     userAvg: number | null;
   };
@@ -93,7 +96,7 @@
             "{video.tagline}"
           </p>
         {/if}
-        <p in:fade={{ delay: 200 }} class=" italic">
+        <p in:fade={{ delay: 200 }} class=" font-light">
           {video.overview}
         </p>
         {#if video.genres.length}
@@ -122,29 +125,33 @@
       </div>
     </div>
 
-    <div>
-      <span class="font-bold"> Acteurs : </span>
-      <div class="flex flex-row flex-wrap rounded-2xl gap-8 mt-2">
-        {#each video.actors as star, i}
+    <div class="overflow-auto overflow-y-hidden pb-4">
+      <span class="font-bold"> Rôles : </span>
+      <div class="grid gap-4 grid-cols-9  w-[100rem] pt-2">
+        {#each video.characters as char, i}
           <a
-            href={`/?searchType=actors&searchText=${star.name}`}
+            href={`/?searchType=actors&searchText=${char.actor.name}`}
             on:click={drawerStore.close}
             in:scale={{ delay: i * 25 }}
-            class=" shadow-md card-hover flex flex-col bg-surface-700 rounded-xl w-24 align-middle items-center !no-underline !text-current"
+            class=" shadow-md card-hover flex flex-col bg-surface-700 rounded-xl w-36 align-middle items-center !no-underline !text-current"
           >
-            {#if star.imgUrl}
+            {#if char.actor.imgUrl}
               <img
-                alt={star.name}
+                alt={char.actor.name}
                 class="rounded-t-2xl w-full"
-                src={"https://image.tmdb.org/t/p/w500" + star.imgUrl}
+                src={"https://image.tmdb.org/t/p/w138_and_h175_face" +
+                  char.actor.imgUrl}
               />
             {:else}
               <UserIcon
                 class="w-full rounded-t-2xl  h-[142px] bg-surface-100 text-surface-700"
               />
             {/if}
+            <span class="px-2 text-center w-full font-light text-900">
+              {char.character}
+            </span>
             <span class="p-2 text-center w-full font-bold text-900">
-              {star.name}
+              {char.actor.name}
             </span>
           </a>
         {/each}

@@ -64,6 +64,7 @@ export type DBMovieMoviesDetail = {
 	credits: {
 		cast: {
 			name: string;
+			character: string;
 			profile_path: string;
 			popularity: number;
 			order: number;
@@ -107,6 +108,9 @@ export type DBMovieSeriesDetail = {
 	aggregate_credits: {
 		cast: {
 			name: string;
+			roles: {
+				character: string;
+			}[];
 			profile_path: string;
 			popularity: number;
 			order: number;

@@ -7,7 +7,6 @@
   import { fade } from "svelte/transition";
 
   export let data: PageData;
-
 </script>
 
 <div class="flex flex-col gap-12 align-middle">
