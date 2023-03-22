@@ -1,50 +1,87 @@
 <script lang="ts">
   import { drawerStore } from "@skeletonlabs/skeleton";
-  import type { Personality, Video } from "@prisma/client";
-  import { Star } from "lucide-svelte";
+  import type { Personality, Video, Comment, Rating } from "@prisma/client";
+  import { MessageSquare, Star } from "lucide-svelte";
   import type { DrawerSettings } from "@skeletonlabs/skeleton";
-  import { scale } from "svelte/transition";
   import { format } from "date-fns";
 
   export let video: Video & {
+    comments: Comment[];
     creators: Personality[];
-    stars: Personality[];
+    actors: Personality[];
+    ratings: Rating[];
+    userAvg: number | null;
   };
-  export let size: 'small' | 'big' = 'small'
-  const drawerSettings: DrawerSettings = {
+  export let size: "small" | "big" = "small";
+  const getDrawerSettings = (): DrawerSettings => ({
     meta: video,
     width: "w-[1200px] ",
     padding: "p-4",
     rounded: "rounded-3xl",
-  };
+  });
+
+  $: hasSeenVideo = !!video.ratings[0]?.note;
 </script>
 
 <button
-  on:click={() => drawerStore.open(drawerSettings)}
-  class={`shadow-lg rounded-3xl ${size === 'small' ? 'h-80' : 'h-full'} min-h-[16rem]  w-full text-left relative overflow-hidden`}
+  on:click={() => drawerStore.open(getDrawerSettings())}
+  class={`shadow-lg rounded-xl ${
+    size === "small" ? "h-80" : "h-full"
+  } min-h-[16rem]  w-full text-left relative overflow-hidden`}
 >
   <img
     alt="movie"
-    class={` w-full h-full rounded-t-3xl object-cover absolute top-0 img rounded-3xl img z-[1] hover:scale-110`}
-    src={"https://image.tmdb.org/t/p/w500" + (size === 'small' ? video.backdropPath : video.posterPath)}
+    class={` w-full h-full object-cover absolute top-0 img rounded-xl img z-[1] hover:scale-110`}
+    src={"https://image.tmdb.org/t/p/w500" +
+      (size === "small" ? video.backdropPath : video.posterPath)}
   />
+  {#if hasSeenVideo}
+    <div
+      class="absolute top-0 left-0 test z-[1] bg-primary-700 w-32 text-center mt-2 ml-[-2rem] pr-2 font-bold h-[18px] "
+    >
+      <div class="text-xs h-1">VU</div>
+    </div>
+  {/if}
   <div
     class="p-4 flex flex-col gap-2 absolute top-0 w-full justify-between content-between h-full"
   >
-    <span
-      class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2  z-[1] rounded-3xl self-end text-primary-500 font-bold shadow-2xl text-sm border-primary-500 border-2"
-    >
-      {video.voteAverage}
-      <Star fill="red" color="red" size="12" />
-    </span>
-    <div class="flex flex-col align-middle z-[1] w-fit">
-      <span class="font-bold line-clamp-1 text-xl">
+    <div class="self-end w-fit z-[1] flex flex-col gap-1">
+      <span
+        class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2 z-[1] rounded-3xl self-end text-blue-500 font-bold shadow-2xl text-sm border-blue-500 border-2"
+      >
+        {video.voteAverage.toFixed(2)}
+        <Star fill="rgb(59 130 246)" color="rgb(59 130 246)" size="12" />
+      </span>
+      {#if video.userAvg}
+        <span
+          class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2 z-[1] rounded-3xl self-end text-primary-500 font-bold shadow-2xl text-sm border-primary-500 border-2"
+        >
+          {video.userAvg.toFixed(2)}
+          <Star fill="red" color="red" size="12" />
+        </span>
+      {/if}
+    </div>
+    <div class="flex flex-col align-middle  w-full">
+      <span class="font-bold line-clamp-1 text-xl z-[2] w-fit">
         {video.title}
       </span>
-      <div class="flex flex-row  items-center align-middle">
-        <span class="text-primary-500 ">
+      <div
+        class="flex flex-row content-between w-full items-center justify-between"
+      >
+        <span class="text-primary-600 z-[2]">
           {format(video.releaseDate, "MM/dd/yyyy")}
         </span>
+        {#if video.comments.length}
+          <span class="flex flex-row items-center gap-2 z-[2]">
+            {video.comments.length}
+            <MessageSquare
+              size="14"
+              class="mt-[2px]"
+              color="white"
+              fill="white"
+            />
+          </span>
+        {/if}
       </div>
     </div>
   </div>
@@ -58,5 +95,13 @@
       transparent 100%
     );
     transition: transform 0.3s;
+  }
+
+  .test {
+    -webkit-transform: rotate(-35deg);
+    -moz-transform: rotate(-35deg);
+    -ms-transform: rotate(-35deg);
+    -o-transform: rotate(-35deg);
+    transform: rotate(-35deg);
   }
 </style>

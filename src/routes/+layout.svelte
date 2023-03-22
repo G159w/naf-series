@@ -11,11 +11,7 @@
     offset,
     arrow,
   } from "@floating-ui/dom";
-  import {
-    Drawer,
-    Modal,
-    storePopup,
-  } from "@skeletonlabs/skeleton";
+  import { NoirLight, Drawer, Modal, storePopup } from "@skeletonlabs/skeleton";
   import {
     AppShell,
     AppBar,

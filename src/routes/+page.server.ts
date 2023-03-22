@@ -16,7 +16,6 @@ type FullVideo = Video & {
 
 type filters = keyof Pick<FullVideo, 'creators' | 'title' | 'actors'>
 
-
 const stringToEnum = <T>(str: string | null | undefined, type: T): keyof T | undefined => {
 	if (!str) return undefined
 	for (let enumMember in type) {
@@ -27,7 +26,38 @@ const stringToEnum = <T>(str: string | null | undefined, type: T): keyof T | und
  return undefined
 }
 
-export const load = (async ({ url }) => {
+const fetchImdbVideosSchema = z.object({
+	searchedVideo: z.string(),
+});
+
+const addMovieDbVideosSchema = z.object({
+	type: z.string(),
+	movieDbId: z.string(),
+});
+
+const createCommentSchema = z.object({
+	videoId: z.string(),
+	content: z.string(),
+});
+
+const updateCommentSchema = z.object({
+	videoId: z.string(),
+	commentId: z.string(),
+	content: z.string(),
+});
+
+const deleteCommentSchema = z.object({
+	videoId: z.string(),
+	commentId: z.string(),
+});
+
+type DBMovieApiResult<T> = {
+	page: number;
+	results: T[]
+}
+
+export const load = (async ({ url, locals }) => {
+	const session = await locals.getSession();
 	const searchText = url.searchParams.get('searchText') || '';
 	const searchType = url.searchParams.get('searchType') || 'title' as filters ;
 	const videoType = stringToEnum(url.searchParams.get('videoType'), VideoType)
@@ -99,46 +129,33 @@ export const load = (async ({ url }) => {
 					createdAt: 'asc'
 				}
 			},
-			ratings: true
+			ratings: {
+				where: {
+					user: {
+						email: {
+							equals: session?.user?.email,
+						}
+					}
+				}
+			},
 		}
 	});
+
 	const genres = await prisma.genre.findMany({
 		orderBy: {
 			name: 'asc',
 		},
 	});
-	return { videos, genres };
+
+	const ratingAvg = await prisma.rating.groupBy({
+		by: ['videoId'],
+		_avg: {
+			note: true,
+		}
+	});
+	const videoWithUserAvg = videos.map((video) => ({ ...video,  userAvg: ratingAvg.find(rate => rate.videoId === video.id)?._avg.note || null }))
+	return { videos: videoWithUserAvg, genres };
 }) satisfies PageServerLoad;
-
-const fetchImdbVideosSchema = z.object({
-	searchedVideo: z.string(),
-});
-
-const addMovieDbVideosSchema = z.object({
-	type: z.string(),
-	movieDbId: z.string(),
-});
-
-const createCommentSchema = z.object({
-	videoId: z.string(),
-	content: z.string(),
-});
-
-const updateCommentSchema = z.object({
-	videoId: z.string(),
-	commentId: z.string(),
-	content: z.string(),
-});
-
-const deleteCommentSchema = z.object({
-	videoId: z.string(),
-	commentId: z.string(),
-});
-
-type DBMovieApiResult<T> = {
-	page: number;
-	results: T[]
-}
 
 export const actions: Actions = {
 	fetchMovieDB: async ({ request, locals }) => {

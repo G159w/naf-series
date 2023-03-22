@@ -122,7 +122,7 @@
 </div>
 
 <form class="shadow-lg">
-  <div class="flex flex-row input-group input-group-divider w-fit h-12">
+  <div class="flex flex-row input-group input-group-divider w-fit h-12 rounded-md">
     <button
       type="button"
       class=" ghost-filled w-24"

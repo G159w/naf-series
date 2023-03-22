@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from "$app/stores";
   import { Star, User as UserIcon } from "lucide-svelte";
   import { fade, scale } from "svelte/transition";
-  import { Drawer, drawerStore } from "@skeletonlabs/skeleton";
+  import { drawerStore } from "@skeletonlabs/skeleton";
   import type {
     Personality,
     Video,
@@ -11,8 +11,10 @@
     Comment,
     User,
   } from "@prisma/client";
-  import { applyAction, enhance } from "$app/forms";
+  import { applyAction, deserialize, enhance } from "$app/forms";
   import { format } from "date-fns";
+  import StarRating from "./StarRating/StarRating.svelte";
+  import { invalidateAll } from "$app/navigation";
 
   $: video = $drawerStore.meta as Video & {
     comments: (Comment & {
@@ -22,8 +24,22 @@
     creators: Personality[];
     actors: Personality[];
     genres: Genre[];
+    userAvg: number | null;
   };
   let comment: string = "";
+
+  async function handleRating(num: number) {
+    const response = await fetch(`videos/${video.id}/ratings`, {
+      method: "POST",
+      body: JSON.stringify({ note: num * 2 }),
+    });
+
+    const result = deserialize(await response.text());
+    if (result) {
+      await invalidateAll();
+    }
+    applyAction(result);
+  }
 </script>
 
 {#if !video}
@@ -39,21 +55,38 @@
           src={"https://image.tmdb.org/t/p/w500" + video.posterPath}
         />
       </div>
-      <div class="flex flex-col gap-8">
+      <div class="flex flex-col gap-8 w-full">
         <h1 in:fade={{ delay: 100 }} class=" font-bold">{video.title}</h1>
         <div
-          class="flex flex-row content-between justify-between items-center align-middle"
+          class="flex flex-row content-between justify-between items-center align-middle mt-[-1rem]"
         >
-          <h3 in:scale={{ delay: 125 }} class="text-red-600 font-bold">
-            {format(video.releaseDate, "MM/dd/yyyy")}
-          </h3>
-          <h3
-            in:scale={{ delay: 150 }}
-            class="flex gap-1 align-middle items-center"
-          >
-            {video.voteAverage}
-            <Star fill="yellow" color="yellow" size="26" />
-          </h3>
+          <div class="flex flex-col gap-2">
+            <h4 in:scale={{ delay: 125 }} class="text-red-600 font-bold">
+              {format(video.releaseDate, "MM/dd/yyyy")}
+            </h4>
+            {#key video.ratings[0]?.note}
+              <StarRating
+                rating={video.ratings[0]?.note / 2}
+                onRate={handleRating}
+              />
+            {/key}
+          </div>
+          <div class="self-end w-fit z-[1] flex flex-col gap-1">
+            <span
+              class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2 z-[1] rounded-3xl self-end text-blue-500 font-bold shadow-2xl text-sm border-blue-500 border-2"
+            >
+              {video.voteAverage.toFixed(2)}
+              <Star fill="rgb(59 130 246)" color="rgb(59 130 246)" size="12" />
+            </span>
+            {#if video.userAvg}
+              <span
+                class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2 z-[1] rounded-3xl self-end text-primary-500 font-bold shadow-2xl text-sm border-primary-500 border-2"
+              >
+                {video.userAvg.toFixed(2)}
+                <Star fill="red" color="red" size="12" />
+              </span>
+            {/if}
+          </div>
         </div>
         {#if video.tagline}
           <p in:fade={{ delay: 150 }} class="font-bold italic">
@@ -121,14 +154,14 @@
       <span class="font-bold"> Commentaires ({video.comments.length}) : </span>
       <div class="flex flex-col flex-wrap  gap-8 mt-2">
         {#each video.comments as comment, i}
-          <div class=" bg-surface-700 p-4 flex flex-col gap-4 rounded-2xl">
-            <div class="flex flex-row gap-4">
+          <div class=" bg-surface-700 p-4 flex flex-col gap-4 rounded-2xl ">
+            <div class="flex flex-row gap-1 align-middle items-baseline ">
               <p class=" font-bold">
                 {comment.user.name}
               </p>
-              <p class=" italic">
-                {comment.createdAt}
-              </p>
+              <span class=" text-xs italic">
+                le {format(comment.createdAt, "MM/dd/yyyy")}
+              </span>
             </div>
             <p>
               {comment.content}

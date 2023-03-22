@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { PageData } from "./$types";
+  import { drawerStore } from "@skeletonlabs/skeleton";
   import AddMovie from "$lib/components/AddVideoButton.svelte";
   import MovieCard from "$lib/components/VideoCard.svelte";
   import SearchMovie from "$lib/components/SearchVideo.svelte";
   import { fade } from "svelte/transition";
 
   export let data: PageData;
-  $: [firstVideo, ...videos] = data.videos;
+
 </script>
 
 <div class="flex flex-col gap-12 align-middle">
