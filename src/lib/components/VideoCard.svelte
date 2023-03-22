@@ -14,7 +14,7 @@
   };
   export let size: "small" | "big" = "small";
   const getDrawerSettings = (): DrawerSettings => ({
-    meta: video,
+    meta: video.id,
     width: "w-[1200px] ",
     padding: "p-4",
     rounded: "rounded-3xl",

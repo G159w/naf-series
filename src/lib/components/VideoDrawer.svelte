@@ -17,7 +17,7 @@
   import StarRating from "./StarRating/StarRating.svelte";
   import { invalidateAll } from "$app/navigation";
 
-  $: video = $drawerStore.meta as Video & {
+  $: videos = ($page.data.videos || []) as (Video & {
     comments: (Comment & {
       user: User;
     })[];
@@ -28,10 +28,13 @@
     })[];
     genres: Genre[];
     userAvg: number | null;
-  };
+  })[];
+  $: videoId = $drawerStore.meta as string;
+  $: video = videos.find((video) => video.id === videoId);
   let comment: string = "";
 
   async function handleRating(num: number) {
+    if (!video) return;
     const response = await fetch(`videos/${video.id}/ratings`, {
       method: "POST",
       body: JSON.stringify({ note: num * 2 }),
@@ -172,7 +175,7 @@
                 le {format(comment.createdAt, "MM/dd/yyyy")}
               </span>
             </div>
-            <p>
+            <p class="whitespace-pre-wrap">
               {comment.content}
             </p>
           </div>
@@ -186,14 +189,14 @@
         method="post"
         action="?/createComment"
         use:enhance={({ data }) => {
+          if (!video) return;
           data.append("videoId", video.id || "");
           return async ({ result }) => {
             if (result.type === "error") {
               await applyAction(result);
             } else {
               comment = "";
-              video.comments.push(result.data);
-              video = video;
+              await invalidateAll();
             }
           };
         }}
