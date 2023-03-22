@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { Star, User as UserIcon } from "lucide-svelte";
+  import { Star, User, User as UserIcon } from "lucide-svelte";
   import { fade, scale } from "svelte/transition";
   import { drawerStore } from "@skeletonlabs/skeleton";
   import type {
@@ -81,17 +81,17 @@
           </div>
           <div class="self-end w-fit z-[1] flex flex-col gap-1">
             <span
-              class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2 z-[1] rounded-3xl self-end text-blue-500 font-bold shadow-2xl text-sm border-blue-500 border-2"
+              class="flex gap-2 align-middle items-center bg-blue-700 w-[4.8rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end text-white font-bold shadow-2xl text-sm "
             >
               {video.voteAverage.toFixed(2)}
-              <Star fill="rgb(59 130 246)" color="rgb(59 130 246)" size="12" />
+              <Star fill="white" color="white" size="12" />
             </span>
             {#if video.userAvg}
               <span
-                class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2 z-[1] rounded-3xl self-end text-primary-500 font-bold shadow-2xl text-sm border-primary-500 border-2"
+                class="flex gap-2 align-middle items-center bg-primary-600 w-[4.8rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end text-white font-bold shadow-2xl text-sm "
               >
                 {video.userAvg.toFixed(2)}
-                <Star fill="red" color="red" size="12" />
+                <Star fill="white" color="white" size="12" />
               </span>
             {/if}
           </div>
@@ -167,14 +167,28 @@
       <div class="flex flex-col flex-wrap  gap-8 mt-2">
         {#each video.comments as comment, i}
           <div class=" bg-surface-700 p-4 flex flex-col gap-4 rounded-2xl ">
-            <div class="flex flex-row gap-1 align-middle items-baseline ">
-              <p class=" font-bold">
-                {comment.user.name}
-              </p>
-              <span class=" text-xs italic">
-                le {format(comment.createdAt, "MM/dd/yyyy")}
-              </span>
+            <div class="flex flex-row gap-2 align-middle items-center ">
+              {#if comment.user?.image}
+                <img
+                  class="w-10 rounded-full"
+                  alt="G img"
+                  src={comment.user.image}
+                />
+              {:else}
+                <User />
+              {/if}
+              <div class="flex flex-col">
+                <p
+                  class=" font-bold text-primary-500 flex justify-baseline align-baseline content-baseline"
+                >
+                  {comment.user.name}
+                </p>
+                <span class=" text-xs italic">
+                  le {format(comment.createdAt, "MM/dd/yyyy")}
+                </span>
+              </div>
             </div>
+            <hr />
             <p class="whitespace-pre-wrap">
               {comment.content}
             </p>

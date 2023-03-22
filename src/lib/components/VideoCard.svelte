@@ -47,17 +47,17 @@
   >
     <div class="self-end w-fit z-[1] flex flex-col gap-1">
       <span
-        class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2 z-[1] rounded-3xl self-end text-blue-500 font-bold shadow-2xl text-sm border-blue-500 border-2"
+        class="flex gap-2 align-middle items-center bg-blue-700 w-[4.8rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end text-white font-bold shadow-2xl text-sm "
       >
         {video.voteAverage.toFixed(2)}
-        <Star fill="rgb(59 130 246)" color="rgb(59 130 246)" size="12" />
+        <Star fill="white" color="white" size="12" />
       </span>
       {#if video.userAvg}
         <span
-          class="flex gap-2 align-middle items-center bg-white w-fit pl-3 pr-2 z-[1] rounded-3xl self-end text-primary-500 font-bold shadow-2xl text-sm border-primary-500 border-2"
+          class="flex gap-2 align-middle items-center bg-primary-600 w-[4.8rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end text-white font-bold shadow-2xl text-sm "
         >
           {video.userAvg.toFixed(2)}
-          <Star fill="red" color="red" size="12" />
+          <Star fill="white" color="white" size="12" />
         </span>
       {/if}
     </div>
