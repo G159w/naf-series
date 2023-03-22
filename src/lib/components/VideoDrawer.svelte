@@ -67,12 +67,14 @@
             <h4 in:scale={{ delay: 125 }} class="text-red-600 font-bold">
               {format(video.releaseDate, "MM/dd/yyyy")}
             </h4>
-            {#key video.ratings[0]?.note}
-              <StarRating
-                rating={video.ratings[0]?.note / 2}
-                onRate={handleRating}
-              />
-            {/key}
+            {#if $page.data.session}
+              {#key video.ratings[0]?.note}
+                <StarRating
+                  rating={video.ratings[0]?.note / 2}
+                  onRate={handleRating}
+                />
+              {/key}
+            {/if}
           </div>
           <div class="self-end w-fit z-[1] flex flex-col gap-1">
             <span

@@ -70,7 +70,7 @@
         </a>
       </svelte:fragment>
       <svelte:fragment slot="trail">
-        <button type="button" class="btn-icon p-0 "><Github /></button>
+        <a href="https://github.com/G159w/naf-series" type="button" class="btn-icon p-0 "><Github /></a>
         {#if $page.data.session}
           <button type="button" class="btn-icon p-0 " use:popup={popupMenu}>
             {#if $page.data.session.user?.image}
