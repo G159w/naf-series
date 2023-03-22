@@ -137,7 +137,7 @@ export const load = (async ({ url, locals }) => {
 				where: {
 					user: {
 						email: {
-							equals: session?.user?.email,
+							equals: session?.user?.email || null,
 						}
 					}
 				}
@@ -157,6 +157,7 @@ export const load = (async ({ url, locals }) => {
 			note: true,
 		}
 	});
+
 	const videoWithUserAvg = videos.map((video) => ({ ...video,  userAvg: ratingAvg.find(rate => rate.videoId === video.id)?._avg.note || null }))
 	return { videos: videoWithUserAvg, genres };
 }) satisfies PageServerLoad;
