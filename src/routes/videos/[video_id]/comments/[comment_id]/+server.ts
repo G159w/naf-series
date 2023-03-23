@@ -71,5 +71,5 @@ export const DELETE = (async ({ request, locals, params }) => {
     }
   })
 
-	return new Response()
+	return new Response(JSON.stringify({}))
 }) satisfies RequestHandler;

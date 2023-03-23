@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { Star, User, User as UserIcon } from "lucide-svelte";
-  import { fade, scale } from "svelte/transition";
+  import { Delete, Star, Trash, User as UserIcon } from "lucide-svelte";
+  import { fade, scale, slide } from "svelte/transition";
   import { drawerStore } from "@skeletonlabs/skeleton";
   import type {
     Personality,
@@ -21,7 +21,9 @@
     comments: (Comment & {
       user: User;
     })[];
-    ratings: Rating[];
+    ratings: (Rating & {
+      user: User;
+    })[];
     creators: Personality[];
     characters: (Role & {
       actor: Personality;
@@ -46,6 +48,34 @@
     }
     applyAction(result);
   }
+
+  $: myRating = video?.ratings.find(
+    (rating) => rating.user.email === $page.data.session?.user?.email
+  );
+
+  async function deleteComment(commentId: string) {
+    if (!video) return;
+    const response = await fetch(`videos/${video.id}/comments/${commentId}`, {
+      method: "DELETE",
+    });
+
+    const result = deserialize(await response.text());
+    console.log(result);
+    await invalidateAll();
+    applyAction(result);
+  }
+
+  async function deleteRating(ratingId: string) {
+    if (!video) return;
+    const response = await fetch(`videos/${video.id}/ratings/${ratingId}`, {
+      method: "DELETE",
+    });
+
+    const result = deserialize(await response.text());
+    console.log(result);
+    await invalidateAll();
+    applyAction(result);
+  }
 </script>
 
 {#if !video}
@@ -66,33 +96,59 @@
         <div
           class="flex flex-row content-between justify-between items-center align-middle mt-[-1rem]"
         >
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-3">
             <h4 in:scale={{ delay: 125 }} class="text-red-600 font-bold">
               {format(video.releaseDate, "MM/dd/yyyy")}
             </h4>
             {#if $page.data.session}
-              {#key video.ratings[0]?.note}
+              <div class="flex flex-col items-center">
                 <StarRating
-                  rating={video.ratings[0]?.note / 2}
+                  rating={myRating ? myRating.note / 2 : undefined}
                   onRate={handleRating}
                 />
-              {/key}
+                {#if myRating}
+                  <div
+                    on:keypress
+                    transition:slide={{ duration: 200 }}
+                    on:click={() => deleteRating(myRating?.id || "")}
+                    class=" text-xs text-primary-500 underline cursor-pointer"
+                  >
+                    Supprimer ma note
+                  </div>
+                {/if}
+              </div>
             {/if}
           </div>
-          <div class="self-end w-fit z-[1] flex flex-col gap-1">
-            <span
-              class="flex gap-2 align-middle items-center bg-blue-700 w-[4.8rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end text-white font-bold shadow-2xl text-sm "
+          <div class="flex flex-row gap-8">
+            <div
+              class="self-end w-fit z-[1] flex flex-col gap-1 content-center align-middle justify-center items-center"
             >
-              {video.voteAverage.toFixed(2)}
-              <Star fill="white" color="white" size="12" />
-            </span>
+              <div class="text-sm font-bold"> Avis des délus </div>
+              <div
+                class="flex gap-2 align-middle items-center  w-[5rem] justify-center pl-3 pr-2 z-[1] rounded-3xl  font-bold shadow-2xl text-sm text-blue-600 bg-white border-2 border-blue-600"
+              >
+                {video.voteAverage.toFixed(2)}
+                <Star fill="blue" color="blue" size="12" />
+              </div>
+              <div class="text-xs italic">
+                votes : {video.voteCount}
+              </div>
+            </div>
             {#if video.userAvg}
-              <span
-                class="flex gap-2 align-middle items-center bg-primary-600 w-[4.8rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end text-white font-bold shadow-2xl text-sm "
+            <div
+              class="self-end w-fit z-[1] flex flex-col gap-1 content-center align-middle justify-center items-center"
+            >
+              <div class="text-sm font-bold"> Avis NAF </div>
+              <div
+                class="flex gap-2 align-middle items-center w-[5rem] justify-center pl-3 pr-2 z-[1] rounded-3xl font-bold shadow-2xl text-sm  text-primary-600 bg-white border-2 border-primary-600"
               >
                 {video.userAvg.toFixed(2)}
-                <Star fill="white" color="white" size="12" />
-              </span>
+                <Star fill="red" color="red" size="12" />
+              </div>
+              <div class="text-xs italic">
+                votes : {video.ratings.length}
+              </div>
+            </div>
             {/if}
           </div>
         </div>
@@ -166,26 +222,38 @@
       <span class="font-bold"> Commentaires ({video.comments.length}) : </span>
       <div class="flex flex-col flex-wrap  gap-8 mt-2">
         {#each video.comments as comment, i}
-          <div class=" bg-surface-700 p-4 flex flex-col gap-4 rounded-2xl ">
-            <div class="flex flex-row gap-2 align-middle items-center ">
-              {#if comment.user?.image}
-                <img
-                  class="w-10 rounded-full"
-                  alt="G img"
-                  src={comment.user.image}
-                />
-              {:else}
-                <User />
-              {/if}
-              <div class="flex flex-col">
-                <p
-                  class=" font-bold text-primary-500 flex justify-baseline align-baseline content-baseline"
-                >
-                  {comment.user.name}
-                </p>
-                <span class=" text-xs italic">
-                  le {format(comment.createdAt, "MM/dd/yyyy")}
-                </span>
+          <div
+            transition:slide={{ duration: 200 }}
+            class=" bg-surface-700 p-4 flex flex-col gap-4 rounded-2xl "
+          >
+            <div class="flex justify-between items-center">
+              <div class="flex flex-row gap-2 align-middle items-center ">
+                {#if comment.user?.image}
+                  <img
+                    class="w-10 rounded-full"
+                    alt="G img"
+                    src={comment.user.image}
+                  />
+                {:else}
+                  <UserIcon />
+                {/if}
+                <div class="flex flex-col">
+                  <p
+                    class=" font-bold text-primary-500 flex justify-baseline align-baseline content-baseline"
+                  >
+                    {comment.user.name}
+                  </p>
+                  <span class=" text-xs italic">
+                    le {format(comment.createdAt, "MM/dd/yyyy")}
+                  </span>
+                </div>
+              </div>
+              <div>
+                {#if comment.user.email === $page.data.session?.user?.email}
+                  <button on:click={() => deleteComment(comment.id)}>
+                    <Trash size="15" />
+                  </button>
+                {/if}
               </div>
             </div>
             <hr />
@@ -199,6 +267,7 @@
     {#if $page.data.session}
       <hr />
       <form
+        transition:slide={{ duration: 200 }}
         class="flex flex-col gap-4 items-end"
         method="post"
         action="?/createComment"

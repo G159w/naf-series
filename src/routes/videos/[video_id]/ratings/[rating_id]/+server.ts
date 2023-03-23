@@ -65,11 +65,11 @@ export const DELETE = (async ({ request, locals, params }) => {
 	const user = await getUserSession(locals);
   if (user?.email !== rating.user.email) throw error(401)
 
-  await prisma.comment.delete({
+  await prisma.rating.delete({
     where: {
       id: params.rating_id
     }
   })
 
-	return new Response()
+	return new Response(JSON.stringify({}))
 }) satisfies RequestHandler;

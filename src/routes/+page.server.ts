@@ -134,12 +134,8 @@ export const load = (async ({ url, locals }) => {
 				}
 			},
 			ratings: {
-				where: {
-					user: {
-						email: {
-							equals: session?.user?.email || null,
-						}
-					}
+				include: {
+					user: true
 				}
 			},
 		}

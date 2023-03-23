@@ -1,15 +1,18 @@
 <script lang="ts">
   import { drawerStore } from "@skeletonlabs/skeleton";
-  import type { Personality, Video, Comment, Rating } from "@prisma/client";
+  import type { Personality, Video, Comment, Rating, User } from "@prisma/client";
   import { MessageSquare, Star } from "lucide-svelte";
   import type { DrawerSettings } from "@skeletonlabs/skeleton";
   import { format } from "date-fns";
+  import { page } from "$app/stores";
 
   export let video: Video & {
     comments: Comment[];
     creators: Personality[];
     actors: Personality[];
-    ratings: Rating[];
+    ratings: (Rating & {
+      user: User;
+    })[];
     userAvg: number | null;
   };
   export let size: "small" | "big" = "small";
@@ -20,7 +23,9 @@
     rounded: "rounded-3xl",
   });
 
-  $: hasSeenVideo = !!video.ratings[0]?.note;
+  $: hasSeenVideo = !!video?.ratings.find(
+    (rating) => rating.user.email === $page.data.session?.user?.email
+  );
 </script>
 
 <button
@@ -47,17 +52,17 @@
   >
     <div class="self-end w-fit z-[1] flex flex-col gap-1">
       <span
-        class="flex gap-2 align-middle items-center bg-blue-700 w-[4.8rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end text-white font-bold shadow-2xl text-sm "
+        class="flex gap-2 align-middle items-center w-[5rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end font-bold shadow-2xl text-sm text-blue-600 bg-white border-2 border-blue-600"
       >
         {video.voteAverage.toFixed(2)}
-        <Star fill="white" color="white" size="12" />
+        <Star fill="blue" color="blue" size="12" />
       </span>
       {#if video.userAvg}
         <span
-          class="flex gap-2 align-middle items-center bg-primary-600 w-[4.8rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end text-white font-bold shadow-2xl text-sm "
+          class="flex gap-2 align-middle items-center w-[5rem] justify-center pl-3 pr-2 z-[1] rounded-3xl self-end font-bold shadow-2xl text-sm text-primary-600 bg-white border-2 border-primary-600"
         >
           {video.userAvg.toFixed(2)}
-          <Star fill="white" color="white" size="12" />
+          <Star fill="red" color="red" size="12" />
         </span>
       {/if}
     </div>
