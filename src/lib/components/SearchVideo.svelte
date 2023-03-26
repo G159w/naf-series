@@ -54,7 +54,7 @@
 
   const videoComboValues = {
     series: "Séries",
-    movies: "Films",
+    movie: "Films",
   };
 
   const searchTypeComboValues = {

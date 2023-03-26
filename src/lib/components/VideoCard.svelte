@@ -74,7 +74,7 @@
         class="flex flex-row content-between w-full items-center justify-between"
       >
         <span class="text-primary-600 z-[2]">
-          {format(video.releaseDate, "MM/dd/yyyy")}
+          {format(video.releaseDate, "dd/MM/yyyy")}
         </span>
         {#if video.comments.length}
           <span class="flex flex-row items-center gap-2 z-[2]">

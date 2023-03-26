@@ -55,6 +55,7 @@ export const load = (async ({ url, locals }) => {
 	const searchText = url.searchParams.get('searchText') || '';
 	const searchType = url.searchParams.get('searchType') || 'title' as filters ;
 	const videoType = stringToEnum(url.searchParams.get('videoType'), VideoType)
+	console.log(videoType);
 	const genre = url.searchParams.get('genre') || ''
 
 	const videos = await prisma.video.findMany({

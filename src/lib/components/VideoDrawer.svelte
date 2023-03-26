@@ -98,7 +98,7 @@
         >
           <div class="flex flex-col gap-3">
             <h4 in:scale={{ delay: 125 }} class="text-red-600 font-bold">
-              {format(video.releaseDate, "MM/dd/yyyy")}
+              {format(video.releaseDate, "dd/MM/yyyy")}
             </h4>
             {#if $page.data.session}
               <div class="flex flex-col items-center">
@@ -244,7 +244,7 @@
                     {comment.user.name}
                   </p>
                   <span class=" text-xs italic">
-                    le {format(comment.createdAt, "MM/dd/yyyy")}
+                    le {format(comment.createdAt, "dd/MM/yyyy")}
                   </span>
                 </div>
               </div>
