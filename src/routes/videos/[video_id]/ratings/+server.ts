@@ -1,9 +1,8 @@
 import type { RequestHandler } from './$types';
-import prisma from "$lib/server/prismadb"
+import prisma from '$lib/server/prismadb';
 
 import { error } from '@sveltejs/kit';
 import { getUserSession, type RatingUpdateOrCreate } from '$lib/server/utils';
-
 
 export const GET = (async ({ params }) => {
 	const comments = await prisma.rating.findMany({
@@ -12,18 +11,18 @@ export const GET = (async ({ params }) => {
 				equals: params.video_id
 			}
 		}
-	})
-	return new Response(JSON.stringify(comments))
+	});
+	return new Response(JSON.stringify(comments));
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, locals, params }) => {
-	const { note } = await request.json() as RatingUpdateOrCreate;
-  if (!note) throw error(400)
+	const { note } = (await request.json()) as RatingUpdateOrCreate;
+	if (!note) throw error(400);
 
 	const userSession = await getUserSession(locals);
-	if (!userSession?.email) throw error(403)
-	const user = await prisma.user.findUnique({ where: { email: userSession.email }})
-	if (!user) throw error(403)
+	if (!userSession?.email) throw error(403);
+	const user = await prisma.user.findUnique({ where: { email: userSession.email } });
+	if (!user) throw error(403);
 	const comment = await prisma.rating.upsert({
 		where: {
 			userId_videoId: {
@@ -32,7 +31,7 @@ export const POST = (async ({ request, locals, params }) => {
 			}
 		},
 		create: {
-			video: { connect: { id: params.video_id }},
+			video: { connect: { id: params.video_id } },
 			user: { connect: { id: user.id } },
 			note: note
 		},
@@ -42,6 +41,6 @@ export const POST = (async ({ request, locals, params }) => {
 		include: {
 			user: true
 		}
-	})
-	return new Response(JSON.stringify(comment))
+	});
+	return new Response(JSON.stringify(comment));
 }) satisfies RequestHandler;

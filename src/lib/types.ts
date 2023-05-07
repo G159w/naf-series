@@ -1,4 +1,4 @@
-import type { VideoType } from "@prisma/client";
+import type { VideoType } from '@prisma/client';
 
 export type DBMovieMovies = {
 	poster_path: string | null;
@@ -15,7 +15,7 @@ export type DBMovieMovies = {
 	title: string;
 	original_title: string;
 	video: boolean;
-}
+};
 
 export type DBMovieSeries = {
 	poster_path: string | null;
@@ -30,7 +30,7 @@ export type DBMovieSeries = {
 	vote_count: number;
 	name: string;
 	original_name: string;
-}
+};
 
 export function isMovie(video: DBMovieMovies | DBMovieSeries): video is DBMovieMovies {
 	return (video as DBMovieMovies).title !== undefined;
@@ -42,7 +42,7 @@ export type DBMovieMoviesDetail = {
 	budget: number | undefined;
 	genres: {
 		id: number;
-		name: string
+		name: string;
 	}[];
 	homepage: string | null;
 	id: number;
@@ -75,15 +75,15 @@ export type DBMovieMoviesDetail = {
 			popularity: number;
 			department: string;
 		}[];
-	}
-}
+	};
+};
 
 export type DBMovieSeriesDetail = {
 	adult: boolean;
 	backdrop_path: string | null;
 	genres: {
 		id: number;
-		name: string
+		name: string;
 	}[];
 	created_by: {
 		name: string;
@@ -121,5 +121,5 @@ export type DBMovieSeriesDetail = {
 			popularity: number;
 			department: string;
 		}[];
-	}
-}
+	};
+};
