@@ -29,7 +29,7 @@
 
 	async function handleRating(num: number) {
 		if (!video) return;
-		const response = await fetch(`videos/${video.id}/ratings`, {
+		const response = await fetch(`/videos/${video.id}/ratings`, {
 			method: 'POST',
 			body: JSON.stringify({ note: num * 2 })
 		});
@@ -47,7 +47,7 @@
 
 	async function deleteComment(commentId: string) {
 		if (!video) return;
-		const response = await fetch(`videos/${video.id}/comments/${commentId}`, {
+		const response = await fetch(`/videoclubs/${$page.params.club_id}/videos/${video.id}/comments/${commentId}`, {
 			method: 'DELETE'
 		});
 
@@ -59,7 +59,7 @@
 
 	async function deleteRating(ratingId: string) {
 		if (!video) return;
-		const response = await fetch(`videos/${video.id}/ratings/${ratingId}`, {
+		const response = await fetch(`/videos/${video.id}/ratings/${ratingId}`, {
 			method: 'DELETE'
 		});
 

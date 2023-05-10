@@ -8,7 +8,6 @@
 
 	$: name = isMovie(video) ? video.title : video.name;
 	$: year = isMovie(video) ? video.release_date : video.first_air_date;
-	console.log(video.poster_path);
 </script>
 
 <button

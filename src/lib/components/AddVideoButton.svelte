@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { Plus } from 'lucide-svelte';
-	import { Modal, modalStore } from '@skeletonlabs/skeleton';
+	import { Clapperboard } from 'lucide-svelte';
+	import { modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalSettings, ModalComponent } from '@skeletonlabs/skeleton';
 	import AddVideoModal from './AddVideoModal.svelte';
+	import FabButton from './common/FabButton.svelte';
 
 	const modalComponent: ModalComponent = {
 		// Pass a reference to your custom component
 		ref: AddVideoModal,
 		// Add the component properties as key/value pairs
-		props: { background: 'bg-red-500' },
+		props: { background: 'bg-red-500', videoClubId: '452151' },
 		// Provide a template literal for the default component slot
 		slot: '<p>Skeleton</p>'
 	};
@@ -19,7 +20,9 @@
 	};
 </script>
 
-<button
-	class="btn-icon p-0 variant-filled-primary btn-icon-lg"
-	on:click={() => modalStore.trigger(d)}><Plus /></button
->
+<FabButton on:click={() => modalStore.trigger(d)}>
+	<span slot="description"> Ajouter un film / série </span>
+	<span slot="icon">
+		<Clapperboard />
+	</span>
+</FabButton>

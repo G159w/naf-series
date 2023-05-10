@@ -4,7 +4,6 @@
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import { isMovie, type DBMovieMovies, type DBMovieSeries } from '$lib/types';
 	import { fade, scale } from 'svelte/transition';
-	import { VideoType } from '@prisma/client';
 	import VideoSuggestion from './VideoSuggestion.svelte';
 
 	let movies = new Array<DBMovieMovies>();
@@ -36,6 +35,7 @@
 				name="searchedVideo"
 				class="w-[250px]"
 				type="search"
+				autocomplete="off"
 				placeholder="Search on movie database..."
 			/>
 			<button class="variant-filled-primary"><Search /></button>

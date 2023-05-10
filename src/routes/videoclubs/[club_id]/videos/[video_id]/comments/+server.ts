@@ -26,6 +26,7 @@ export const POST = (async ({ request, locals, params }) => {
 		data: {
 			video: { connect: { id: params.video_id } },
 			user: { connect: { email: user.email } },
+			videoClub: { connect: { id: params.club_id }},
 			content: content
 		},
 		include: {
