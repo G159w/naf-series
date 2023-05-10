@@ -1,15 +1,11 @@
 <script lang="ts">
-	import { clipboard } from '@skeletonlabs/skeleton';
-	import { fade, scale, slide } from 'svelte/transition';
+	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
 	let showDesc: boolean = false;
-	export let clipboardContent: string | undefined = undefined;
 </script>
 
-
 <button
-	use:clipboard={clipboardContent}
 	on:click
 	transition:scale={{ delay: 0, duration: 300, easing: quintOut }}
 	on:mouseenter={() => (showDesc = true)}

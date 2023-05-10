@@ -6,6 +6,11 @@
 	import FabButton from './common/FabButton.svelte';
 
 	let displayMoreIcons = false;
+
+	let clipCopy = (clip: string) => {
+		navigator.clipboard.writeText(clip);
+	};
+
 	export let videoClub: VideoClub;
 </script>
 
@@ -16,14 +21,18 @@
 	}}
 >
 	{#if displayMoreIcons}
-		<FabButton clipboardContent={`${$page.url.host}/videoclubs/${videoClub.inviteId}/invite`}>
+		<FabButton
+			on:click={() => clipCopy(`https://${$page.url.host}/videoclub/${videoClub.inviteId}/invite`)}
+		>
 			<span slot="description"> Lien d'invitation </span>
 			<span slot="icon">
 				<UserPlus />
 			</span>
 		</FabButton>
 
-		<FabButton clipboardContent={`${$page.url.host}/videoclubs/${videoClub.watchId}/watch`}>
+		<FabButton
+			on:click={() => clipCopy(`https://${$page.url.host}/videoclub/${videoClub.watchId}/watch`)}
+		>
 			<span slot="description"> Lien visiteur </span>
 			<span slot="icon">
 				<Glasses />

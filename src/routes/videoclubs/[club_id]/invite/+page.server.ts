@@ -3,7 +3,7 @@ import prisma from '$lib/server/prismadb';
 import { getUserSession } from '$lib/server/utils';
 import { redirect } from '@sveltejs/kit';
 
-export const load = (async ({ url, params, locals }) => {
+export const load = (async ({ params, locals }) => {
 	const videoClub = await prisma.videoClub.findUnique({
 		where: { inviteId: params.club_id }
 	});
