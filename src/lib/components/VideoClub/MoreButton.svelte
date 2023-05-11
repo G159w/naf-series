@@ -2,8 +2,8 @@
 	import { Glasses, Plus, UserPlus } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import type { VideoClub } from '@prisma/client';
-	import AddVideoButton from './AddVideoButton.svelte';
-	import FabButton from './common/FabButton.svelte';
+	import AddVideoButton from './AddVideo/AddVideoButton.svelte';
+	import FabButton from '../common/FabButton.svelte';
 
 	let displayMoreIcons = false;
 
@@ -22,7 +22,7 @@
 >
 	{#if displayMoreIcons}
 		<FabButton
-			on:click={() => clipCopy(`https://${$page.url.host}/videoclub/${videoClub.inviteId}/invite`)}
+			on:click={() => clipCopy(`https://${$page.url.host}/videoclubs/${videoClub.inviteId}/invite`)}
 		>
 			<span slot="description"> Lien d'invitation </span>
 			<span slot="icon">
@@ -31,7 +31,7 @@
 		</FabButton>
 
 		<FabButton
-			on:click={() => clipCopy(`https://${$page.url.host}/videoclub/${videoClub.watchId}/watch`)}
+			on:click={() => clipCopy(`https://${$page.url.host}/videoclubs/${videoClub.watchId}/watch`)}
 		>
 			<span slot="description"> Lien visiteur </span>
 			<span slot="icon">

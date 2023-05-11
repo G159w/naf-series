@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import AddMovie from '$lib/components/AddVideoButton.svelte';
-	import MovieCard from '$lib/components/VideoCard.svelte';
-	import SearchMovie from '$lib/components/SearchVideo.svelte';
+	import AddMovie from '$lib/components/VideoClub/AddVideo/AddVideoButton.svelte';
+	import MovieCard from '$lib/components/VideoClub/VideoCard.svelte';
+	import SearchMovie from '$lib/components/VideoClub/SearchVideo.svelte';
 	import { fade, scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 

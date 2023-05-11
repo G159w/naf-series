@@ -9,10 +9,10 @@
 	import { User, LogOut } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { signIn, signOut } from '@auth/sveltekit/client';
-	import MovieDrawer from '$lib/components/VideoDrawer.svelte';
 	import { onMount } from 'svelte';
 	import LottieGithub from '$lib/assets/lottie/github.json';
 	import lottie from 'lottie-web';
+	import VideoDrawer from '$lib/components/VideoDrawer/VideoDrawer.svelte';
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
@@ -59,7 +59,7 @@
 <Modal />
 
 <Drawer>
-	<MovieDrawer />
+	<VideoDrawer />
 </Drawer>
 <AppShell>
 	<svelte:fragment slot="header">

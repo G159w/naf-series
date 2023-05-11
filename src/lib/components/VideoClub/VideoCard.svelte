@@ -22,27 +22,31 @@
 		padding: 'p-4',
 		rounded: 'rounded-3xl'
 	});
-
+	let hovered = false;
 	$: hasSeenVideo = !!video?.ratings.find(
 		(rating) => rating.user.email === $page.data.session?.user?.email
 	);
 </script>
 
 <button
+	on:mouseenter={() => (hovered = true)}
+	on:mouseleave={() => (hovered = false)}
 	on:click={() => drawerStore.open(getDrawerSettings())}
 	class={`shadow-lg rounded-xl ${
 		size === 'small' ? 'h-80' : 'h-full'
-	} min-h-[16rem]  w-full text-left relative overflow-hidden`}
+	} min-h-[16rem]  w-full text-left relative overflow-hidden [&>*]:pointer-events-none`}
 >
 	<img
 		alt="movie"
-		class={` w-full h-full object-cover absolute top-0 img rounded-xl img z-[1] hover:scale-110`}
+		class={` w-full h-full object-cover absolute top-0 img rounded-xl img z-[1] ${
+			hovered ? 'scale-110' : ''
+		}`}
 		src={'https://image.tmdb.org/t/p/w500' +
 			(size === 'small' ? video.backdropPath : video.posterPath)}
 	/>
 	{#if hasSeenVideo}
 		<div
-			class="absolute top-0 left-0 test z-[1] bg-primary-700 w-32 text-center mt-2 ml-[-2rem] pr-2 font-bold h-[18px] "
+			class="absolute top-0 left-0 rotate z-[1] bg-primary-700 w-32 text-center mt-2 ml-[-2rem] pr-2 font-bold h-[18px]"
 		>
 			<div class="text-xs h-1">VU</div>
 		</div>
@@ -64,7 +68,7 @@
 				</span>
 			{/if}
 		</div>
-		<div class="flex flex-col align-middle  w-full">
+		<div class="flex flex-col align-middle w-full">
 			<span class="font-bold line-clamp-1 text-xl z-[2] w-fit">
 				{video.title}
 			</span>
@@ -89,7 +93,7 @@
 		transition: transform 0.3s;
 	}
 
-	.test {
+	.rotate {
 		-webkit-transform: rotate(-35deg);
 		-moz-transform: rotate(-35deg);
 		-ms-transform: rotate(-35deg);

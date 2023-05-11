@@ -3,7 +3,7 @@
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalSettings, ModalComponent } from '@skeletonlabs/skeleton';
 	import AddVideoModal from './AddVideoModal.svelte';
-	import FabButton from './common/FabButton.svelte';
+	import FabButton from '../../common/FabButton.svelte';
 
 	const modalComponent: ModalComponent = {
 		// Pass a reference to your custom component

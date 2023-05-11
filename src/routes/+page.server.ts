@@ -16,6 +16,9 @@ export const load = (async ({ locals }) => {
 						}
 					}
 				}
+			},
+			orderBy: {
+				name: 'asc'
 			}
 		});
 		return { videoClubs: clubs };

@@ -131,7 +131,7 @@ model Comment {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  videoClub   VideoClub @relation(fields: [videoClubId], references: [id])
+  videoClub   VideoClub @relation(fields: [videoClubId], references: [id], onDelete: Cascade)
   videoClubId String
 
   createdAt DateTime @default(now())

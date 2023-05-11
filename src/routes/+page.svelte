@@ -34,6 +34,11 @@
 	};
 </script>
 
+<svelte:head>
+	<title>NAF Series</title>
+	<meta name="home" content="NAF Series" />
+</svelte:head>
+
 <div
 	in:scale={{ delay: 50, duration: 600, easing: quintOut }}
 	class="flex flex-col gap-16 align-middle w-full items-center h-full content-center justify-center"

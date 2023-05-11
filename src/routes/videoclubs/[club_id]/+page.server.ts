@@ -46,11 +46,6 @@ const updateCommentSchema = z.object({
 	content: z.string()
 });
 
-const deleteCommentSchema = z.object({
-	videoId: z.string(),
-	commentId: z.string()
-});
-
 type DBMovieApiResult<T> = {
 	page: number;
 	results: T[];
@@ -64,9 +59,9 @@ export const load = (async ({ url, params }) => {
 
 	const videoClub = await prisma.videoClub.findUnique({
 		where: { id: params.club_id }
-	})
+	});
 
-	if (!videoClub) throw error(404, 'VideoClub not found')
+	if (!videoClub) throw error(404, 'VideoClub not found');
 
 	const videos = await prisma.video.findMany({
 		where: {
@@ -152,7 +147,7 @@ export const load = (async ({ url, params }) => {
 			},
 			comments: {
 				where: {
-					videoClubId: params.club_id,
+					videoClubId: params.club_id
 				},
 				include: {
 					user: true
@@ -162,6 +157,15 @@ export const load = (async ({ url, params }) => {
 				}
 			},
 			ratings: {
+				where: {
+					user: {
+						videoClubs: {
+							some: {
+								id: params.club_id
+							}
+						}
+					}
+				},
 				include: {
 					user: true
 				}
@@ -176,6 +180,15 @@ export const load = (async ({ url, params }) => {
 	});
 
 	const ratingAvg = await prisma.rating.groupBy({
+		where: {
+			user: {
+				videoClubs: {
+					some: {
+						id: params.club_id
+					}
+				}
+			}
+		},
 		by: ['videoId'],
 		_avg: {
 			note: true
@@ -186,7 +199,7 @@ export const load = (async ({ url, params }) => {
 		...video,
 		userAvg: ratingAvg.find((rate) => rate.videoId === video.id)?._avg.note || null
 	}));
-	return { videos: videoWithUserAvg, genres, videoClub	};
+	return { videos: videoWithUserAvg, genres, videoClub };
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
@@ -431,10 +444,13 @@ export const actions: Actions = {
 			const formData = Object.fromEntries(await request.formData());
 			const { commentId, videoId, content } = updateCommentSchema.parse(formData);
 
-			const result = await fetch(`/videoclubs/${params.club_id}/videos/${videoId}/comments/${commentId}`, {
-				method: 'PATCH',
-				body: JSON.stringify({ content })
-			});
+			const result = await fetch(
+				`/videoclubs/${params.club_id}/videos/${videoId}/comments/${commentId}`,
+				{
+					method: 'PATCH',
+					body: JSON.stringify({ content })
+				}
+			);
 			console.log(timer.time(), result.json());
 			return result.json();
 		} catch (error) {
