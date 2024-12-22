@@ -1,16 +1,20 @@
-import { SvelteKitAuth } from "@auth/sveltekit"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import Google from '@auth/core/providers/google'
-import { GOOGLE_ID, GOOGLE_SECRET } from "$env/static/private"
-import type { Profile } from "@auth/core/types"
-import type { OAuth2Config } from "@auth/core/providers"
-import prisma from "$lib/server/prismadb"
-import type { Adapter } from "@auth/core/adapters"
+import type { Handle } from '@sveltejs/kit';
 
-export const handle = SvelteKitAuth({
-  trustHost: true,
-  adapter: PrismaAdapter(prisma) as Adapter,
-  providers: [
-    Google({ clientId: GOOGLE_ID, clientSecret: GOOGLE_SECRET }) as OAuth2Config<Profile>,
-  ],
-})
+import { startServer } from '$lib/server/api';
+import { sequence } from '@sveltejs/kit/hooks';
+
+import { handle as handleAuth } from './auth';
+
+// Without this custom hook, sveltekit would not allow the response from Elysia.
+const handleFn = (async ({ event, resolve }) => {
+  return await resolve(event, {
+    filterSerializedResponseHeaders: () => {
+      return true;
+    }
+  });
+}) satisfies Handle;
+
+// Sequence is a custom hook that allows multiple hooks to be executed in sequence.
+export const handle = sequence(handleFn, handleAuth);
+
+startServer();

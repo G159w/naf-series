@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["filteredRelationCount", "extendedWhereUnique"]
+  previewFeatures = ["tracing"]
 }
 
 datasource db {
@@ -168,8 +168,7 @@ model Role {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([actorId, videoId])
-  @@unique([order, character])
+  @@unique([actorId, videoId, character])
 }
 
 model VideoClub {
