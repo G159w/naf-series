@@ -44,7 +44,8 @@
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.0.0",
     "vaul-svelte": "^1.0.0-next.3",
-    "vite": "^5.0.3"
+    "vite": "^5.0.3",
+    "@sveltejs/adapter-vercel": "5.5.2"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
