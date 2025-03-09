@@ -40,7 +40,7 @@
                 {user.name}
               </div>
 
-              <Button variant="ghost" onclick={signOut}>
+              <Button variant="ghost" onclick={() => signOut({ redirectTo: '/' })}>
                 <LogOut></LogOut>
               </Button>
             </Sidebar.MenuItem>

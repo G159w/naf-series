@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '$lib/components/ui/button/button.svelte';
-  import { signIn } from '@auth/sveltekit/client';
+  import { SignIn } from '@auth/sveltekit/components';
   import { quintOut } from 'svelte/easing';
   import { scale } from 'svelte/transition';
 
@@ -29,8 +29,8 @@
     {/if} -->
   {:else}
     <h3>Visitez vos <b class="text-primary-500">VideoClubs</b> en ligne avec vos amis</h3>
-    <Button class="btn variant-filled-primary" onclick={() => signIn('google')}>
-      Se connecter
-    </Button>
+    <SignIn provider="google">
+      <Button slot="submitButton" class="btn variant-filled-primary">Se connecter</Button>
+    </SignIn>
   {/if}
 </div>

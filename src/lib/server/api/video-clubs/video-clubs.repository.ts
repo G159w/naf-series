@@ -41,9 +41,6 @@ export class VideoClubsRepository extends PrismaRepository {
 
   async getOneDetail({ search, userId, videoClubId }: GetOneDetailOptions, db = this.prisma.db) {
     return db.videoClub.findFirst({
-      cacheStrategy: {
-        ttl: 60
-      },
       include: {
         videos: {
           include: {
