@@ -14,7 +14,6 @@ export const authGuard = (sessionsService: SessionsService) =>
     const token =
       cookie['authjs.session-token'].value ?? cookie['__Secure-authjs.session-token'].value;
 
-    console.log('authGuard', cookie);
     if (!token) {
       console.log('authGuard session-token not found');
       throw Unauthorized();

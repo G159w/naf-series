@@ -76,36 +76,11 @@ export class VideosRepository extends PrismaRepository {
   }
 
   async createOrUpdate(data: CreateVideoOptions, db = this.prisma.db) {
-    console.log('data', JSON.stringify(data));
     const video = await db.video.upsert({
       create: {
         adult: data.adult,
         backdropPath: data.backdrop_path,
         budget: data.budget,
-        characters: {
-          connectOrCreate: data.credits.cast.map((actor) => ({
-            create: {
-              actor: {
-                connectOrCreate: {
-                  create: {
-                    imgUrl: actor.profile_path,
-                    name: actor.name,
-                    popularity: actor.popularity
-                  },
-                  where: { name: actor.name }
-                }
-              },
-              character: actor.character,
-              order: actor.order
-            },
-            where: {
-              order_character: {
-                character: actor.character,
-                order: actor.order
-              }
-            }
-          }))
-        },
         creators: {
           connectOrCreate: data.credits.crew.map((creator) => ({
             create: {
@@ -142,30 +117,6 @@ export class VideosRepository extends PrismaRepository {
         adult: data.adult,
         backdropPath: data.backdrop_path,
         budget: data.budget,
-        characters: {
-          connectOrCreate: data.credits.cast.map((actor) => ({
-            create: {
-              actor: {
-                connectOrCreate: {
-                  create: {
-                    imgUrl: actor.profile_path,
-                    name: actor.name,
-                    popularity: actor.popularity
-                  },
-                  where: { name: actor.name }
-                }
-              },
-              character: actor.character,
-              order: actor.order
-            },
-            where: {
-              order_character: {
-                character: actor.character,
-                order: actor.order
-              }
-            }
-          }))
-        },
         creators: {
           connectOrCreate: data.credits.crew.map((creator) => ({
             create: {
@@ -199,11 +150,36 @@ export class VideosRepository extends PrismaRepository {
         voteCount: data.vote_count
       },
       where: {
-        title_releaseDate: {
-          releaseDate: new Date(data.release_date),
-          title: data.title
-        }
+        movieDbId: data.id.toString()
       }
+    });
+
+    // Delete all characters and recreate them
+    await db.role.deleteMany({ where: { videoId: video.id } });
+
+    await db.$transaction(async (prisma) => {
+      const rolePromises = [];
+      for (const actor of data.credits.cast) {
+        const rolePromise = prisma.role.create({
+          data: {
+            actor: {
+              connectOrCreate: {
+                create: {
+                  imgUrl: actor.profile_path,
+                  name: actor.name,
+                  popularity: actor.popularity
+                },
+                where: { name: actor.name }
+              }
+            },
+            character: actor.character,
+            order: actor.order,
+            video: { connect: { id: video.id } }
+          }
+        });
+        rolePromises.push(rolePromise);
+      }
+      await Promise.all(rolePromises);
     });
 
     return video;
