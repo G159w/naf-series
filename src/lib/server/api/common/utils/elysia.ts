@@ -10,11 +10,18 @@ export const authGuard = (sessionsService: SessionsService) =>
   new Elysia({
     name: 'authGuard'
   }).derive({ as: 'global' }, async function deriveBearer({ cookie }) {
-    if (!cookie['authjs.session-token'].value) {
+    // authjs.session-token is used in development (http), __Secure-authjs.session-token in production (https)
+    const token =
+      cookie['authjs.session-token'].value ?? cookie['__Secure-authjs.session-token'].value;
+
+    console.log('authGuard', cookie);
+    if (!token) {
+      console.log('authGuard session-token not found');
       throw Unauthorized();
     }
-    const session = await sessionsService.findUserSessions(cookie['authjs.session-token'].value);
+    const session = await sessionsService.findUserSessions(token);
     if (!session) {
+      console.log('authGuard session not found');
       throw Unauthorized();
     }
     return { user: session.user };
