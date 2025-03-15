@@ -4,11 +4,9 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": ["javascript", "javascriptreact", "json", "jsonc", "json5", "svelte"],
+  "eslint.validate": ["javascript", "javascriptreact", "json", "jsonc", "json5", "svelte", "typescript"],
 
-  "cSpell.words": [
-    "Elysia"
-  ],
+  "cSpell.words": ["Elysia"],
   "cSpell.language": "en,fr-FR",
 
   "i18n-ally.localesPaths": ["i18n/locales"],

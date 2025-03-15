@@ -104,7 +104,7 @@
             <div
               class="flex animate-fade flex-wrap justify-center gap-4 animate-delay-500 md:justify-start"
             >
-              {#each data.data.characters || [] as char}
+              {#each data.data.characters || [] as char (char.id)}
                 <div
                   class="flex w-32 flex-col items-center gap-1 animate-alternate animate-once animate-ease-in-out"
                 >

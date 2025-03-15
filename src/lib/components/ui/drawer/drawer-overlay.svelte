@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { Drawer as DrawerPrimitive } from "vaul-svelte";
-	import { cn } from "$lib/utils/ui.js";
+  import { cn } from '$lib/utils/ui.js';
+  import { Drawer as DrawerPrimitive } from 'vaul-svelte';
 
-	let {
-		ref = $bindable(null),
-		class: className,
-		...restProps
-	}: DrawerPrimitive.OverlayProps = $props();
+  let {
+    class: className,
+    ref = $bindable(null),
+    ...restProps
+  }: DrawerPrimitive.OverlayProps = $props();
 </script>
 
 <DrawerPrimitive.Overlay
-	bind:ref
-	class={cn("fixed inset-0 z-50 bg-black/80", className)}
-	{...restProps}
+  bind:ref
+  class={cn('fixed inset-0 z-50 bg-black/80', className)}
+  {...restProps}
 />

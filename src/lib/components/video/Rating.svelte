@@ -45,8 +45,7 @@
     }
   });
 
-  const submitComment = (value?: number[]) => {
-    const rating = value?.[0];
+  const submitComment = (rating?: number) => {
     if (!rating && userRating) {
       return $deleteCommentMutation.mutate({
         ratingId: userRating.id,
@@ -70,7 +69,7 @@
       });
   };
 
-  const debounceFn = debounce((rating: number[]) => submitComment(rating), 300);
+  const debounceFn = debounce((rating?: number) => submitComment(rating), 300);
 
   // svelte-ignore state_referenced_locally
   let rating = $state(userRating ? [userRating.note] : []);
@@ -78,19 +77,20 @@
 
 <div class="flex flex-row items-center gap-2">
   <Slider
+    type="multiple"
     bind:value={rating}
     min={0}
     max={10}
     step={1}
-    onValueChange={(value) => debounceFn(value)}
+    onValueChange={(value) => debounceFn(value[0])}
   />
   <div class="flex gap-2">
-    <span>{rating?.[0] ?? '-'}</span>
+    <span>{rating.length ? rating : '-'}</span>
     <Star size="24" fill="yellow" strokeWidth={0} />
   </div>
   <Button
     variant="ghost"
-    disabled={rating?.[0] === undefined}
+    disabled={rating.length === 0}
     onclick={() => {
       rating = [];
       submitComment(undefined);

@@ -52,7 +52,7 @@
 <div
   class="flex animate-fade-right flex-col gap-2 pb-12 animate-normal animate-fill-forwards animate-ease-in-out"
 >
-  {#each video.comments || [] as comment}
+  {#each video.comments || [] as comment (comment.id)}
     <div class="my-2 border-b border-gray-800"></div>
     <div class="flex flex-col">
       <div class="flex h-7 items-center gap-3 text-sm font-bold">

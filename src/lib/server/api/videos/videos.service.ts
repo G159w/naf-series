@@ -81,11 +81,13 @@ export class VideosService {
   }
 
   async deleteComment(commentId: string, userId: string) {
+    console.log(userId);
     // Check if the user is the owner of the comment
     return this.videosRepository.deleteComment(commentId);
   }
 
   async deleteRating(ratingId: string, userId: string) {
+    console.log(userId);
     // Check if the user is the owner of the rating
     return this.videosRepository.deleteRating(ratingId);
   }

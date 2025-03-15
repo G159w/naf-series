@@ -1,4 +1,4 @@
-import { type Static, type TSchema, Type } from '@sinclair/typebox';
+import { type Static, Type } from '@sinclair/typebox';
 
 import { Nullable } from '../../common/utils/elysia';
 

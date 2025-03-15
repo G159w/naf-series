@@ -95,7 +95,7 @@
                     <img
                       class="h-14 w-[38px]"
                       src={`https://image.tmdb.org/t/p/w500${video.poster_path}`}
-                      alt={''}
+                      alt=""
                     />
                   </div>
                   <div class="flex flex-col items-start justify-start">

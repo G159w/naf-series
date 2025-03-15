@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { Drawer as DrawerPrimitive } from "vaul-svelte";
-	import { cn } from "$lib/utils/ui.js";
+  import { cn } from '$lib/utils/ui.js';
+  import { Drawer as DrawerPrimitive } from 'vaul-svelte';
 
-	let {
-		ref = $bindable(null),
-		class: className,
-		...restProps
-	}: DrawerPrimitive.TitleProps = $props();
+  let {
+    class: className,
+    ref = $bindable(null),
+    ...restProps
+  }: DrawerPrimitive.TitleProps = $props();
 </script>
 
 <DrawerPrimitive.Title
-	bind:ref
-	class={cn("text-lg font-semibold leading-none tracking-tight", className)}
-	{...restProps}
+  bind:ref
+  class={cn('text-lg font-semibold leading-none tracking-tight', className)}
+  {...restProps}
 />
