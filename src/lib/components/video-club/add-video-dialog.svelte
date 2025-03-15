@@ -70,71 +70,69 @@
     >
       <Input class="mt-4" placeholder="Nom du film" bind:value={search} type="text" />
     </form>
-    {#await $query.data then data}
-      {#if data?.data}
-        <Tabs.Root value="movies" class="h-[350px]">
-          <Tabs.List class="w-full">
-            <Tabs.Trigger value="movies" onclick={() => (selectedType = 'movies')} class="w-full">
-              Films
-            </Tabs.Trigger>
-            <Tabs.Trigger value="series" class="w-full" onclick={() => (selectedType = 'series')}>
-              Series
-            </Tabs.Trigger>
-          </Tabs.List>
-          <Tabs.Content value="movies">
-            <div class="flex flex-col pt-2">
-              {#each data.data.movies as video (video.id)}
-                <Button
-                  variant="ghost"
-                  class={cn('flex h-14 items-center justify-start gap-2 px-0', {
-                    'bg-accent text-accent-foreground': selectedVideoMovieDbId === String(video.id)
-                  })}
-                  onclick={() => (selectedVideoMovieDbId = String(video.id))}
-                >
-                  <div>
-                    <img
-                      class="h-14 w-[38px]"
-                      src={`https://image.tmdb.org/t/p/w500${video.poster_path}`}
-                      alt=""
-                    />
-                  </div>
-                  <div class="flex flex-col items-start justify-start">
-                    <div class="line-clamp-1 text-sm font-bold">{video.title}</div>
-                    <div class="text-xs font-thin">{video.release_date}</div>
-                  </div>
-                </Button>
-              {/each}
-            </div>
-          </Tabs.Content>
-          <Tabs.Content value="series">
-            <div class="flex flex-col pt-2">
-              {#each data.data.series as video (video.id)}
-                <Button
-                  variant="ghost"
-                  class={cn('flex h-14 items-center justify-start gap-2 px-0', {
-                    'bg-accent text-accent-foreground': selectedVideoMovieDbId === String(video.id)
-                  })}
-                  onclick={() => (selectedVideoMovieDbId = String(video.id))}
-                >
+    {#if $query.isSuccess && $query.data.data}
+      <Tabs.Root value="movies" class="h-[350px]">
+        <Tabs.List class="w-full">
+          <Tabs.Trigger value="movies" onclick={() => (selectedType = 'movies')} class="w-full">
+            Films
+          </Tabs.Trigger>
+          <Tabs.Trigger value="series" class="w-full" onclick={() => (selectedType = 'series')}>
+            Series
+          </Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="movies">
+          <div class="flex flex-col pt-2">
+            {#each $query.data.data.movies as video (video.id)}
+              <Button
+                variant="ghost"
+                class={cn('flex h-14 items-center justify-start gap-2 px-0', {
+                  'bg-accent text-accent-foreground': selectedVideoMovieDbId === String(video.id)
+                })}
+                onclick={() => (selectedVideoMovieDbId = String(video.id))}
+              >
+                <div>
                   <img
                     class="h-14 w-[38px]"
                     src={`https://image.tmdb.org/t/p/w500${video.poster_path}`}
-                    alt={video.name}
+                    alt=""
                   />
-                  <div class="flex flex-col items-start justify-start">
-                    <div class="line-clamp-1 text-sm font-bold">{video.name}</div>
-                    <div class="text-xs font-thin">{video.first_air_date}</div>
-                  </div>
-                </Button>
-              {/each}
-            </div>
-          </Tabs.Content>
-        </Tabs.Root>
-        <div class="flex justify-end">
-          <Button disabled={!selectedVideoMovieDbId} onclick={() => addVideo()}>Ajouter</Button>
-        </div>
-      {/if}
-    {/await}
+                </div>
+                <div class="flex flex-col items-start justify-start">
+                  <div class="line-clamp-1 text-sm font-bold">{video.title}</div>
+                  <div class="text-xs font-thin">{video.release_date}</div>
+                </div>
+              </Button>
+            {/each}
+          </div>
+        </Tabs.Content>
+        <Tabs.Content value="series">
+          <div class="flex flex-col pt-2">
+            {#each $query.data.data.series as video (video.id)}
+              <Button
+                variant="ghost"
+                class={cn('flex h-14 items-center justify-start gap-2 px-0', {
+                  'bg-accent text-accent-foreground': selectedVideoMovieDbId === String(video.id)
+                })}
+                onclick={() => (selectedVideoMovieDbId = String(video.id))}
+              >
+                <img
+                  class="h-14 w-[38px]"
+                  src={`https://image.tmdb.org/t/p/w500${video.poster_path}`}
+                  alt={video.name}
+                />
+                <div class="flex flex-col items-start justify-start">
+                  <div class="line-clamp-1 text-sm font-bold">{video.name}</div>
+                  <div class="text-xs font-thin">{video.first_air_date}</div>
+                </div>
+              </Button>
+            {/each}
+          </div>
+        </Tabs.Content>
+      </Tabs.Root>
+      <div class="flex justify-end">
+        <Button disabled={!selectedVideoMovieDbId} onclick={() => addVideo()}>Ajouter</Button>
+      </div>
+    {/if}
   </Dialog.Content>
 </Dialog.Root>
 

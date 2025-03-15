@@ -1,19 +1,27 @@
 <script lang="ts">
+  import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input/index';
   import { debounce } from '$lib/components/utils.svelte.js';
   import AddVideoDialog from '$lib/components/video-club/add-video-dialog.svelte';
+  import VideoClubDeleteModal from '$lib/components/video-club/video-club-delete-modal.svelte';
   import VideoDrawer from '$lib/components/video/VideoDrawer.svelte';
   import dayjs from 'dayjs';
+  import { Trash2 } from 'lucide-svelte';
   import { sum } from 'radash';
   import { queryParameters } from 'sveltekit-search-params';
 
   const params = queryParameters();
 
   let { data } = $props();
+  let deleteModalOpen = $state(false);
 
   const search = debounce((value?: string) => {
     $params.title = value;
   }, 300);
+
+  function openDeleteModal() {
+    deleteModalOpen = true;
+  }
 </script>
 
 <svelte:head>
@@ -25,7 +33,12 @@
   <div class="flex w-full flex-row items-center justify-center gap-4 pt-8">
     <div class="flex items-center gap-8">
       <h1 class="text-4xl font-bold">{data.videoClub.data?.name}</h1>
-      <AddVideoDialog videoClubId={data.videoClub.data?.id || ''} />
+      <div class="flex items-center gap-2">
+        <AddVideoDialog videoClubId={data.videoClub.data?.id || ''} />
+        <Button variant="destructive" size="icon" onclick={openDeleteModal}>
+          <Trash2 size={16} />
+        </Button>
+      </div>
     </div>
   </div>
   <Input oninput={(e) => search((e.target as HTMLInputElement).value)} />
@@ -77,3 +90,9 @@
   </div>
   <div class=""></div>
 </div>
+
+<VideoClubDeleteModal
+  bind:open={deleteModalOpen}
+  videoClubId={data.videoClub.data?.id || ''}
+  videoClubName={data.videoClub.data?.name || ''}
+/>

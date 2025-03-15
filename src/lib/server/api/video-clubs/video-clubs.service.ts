@@ -3,6 +3,16 @@ import { inject, injectable } from '@needle-di/core';
 import { NotFound } from '../common/utils/exceptions';
 import { VideoClubsRepository } from './video-clubs.repository';
 
+type CreateVideoClubOptions = {
+  name: string;
+  userId: string;
+};
+
+type DeleteVideoClubOptions = {
+  userId: string;
+  videoClubId: string;
+};
+
 type GetOneDetailOptions = {
   search: {
     actors?: string;
@@ -22,6 +32,18 @@ type GetOneOptions = {
 @injectable()
 export class VideoClubsService {
   constructor(private videoClubsRepository = inject(VideoClubsRepository)) {}
+
+  async create(options: CreateVideoClubOptions) {
+    return this.videoClubsRepository.create(options);
+  }
+
+  async delete(options: DeleteVideoClubOptions) {
+    const videoClub = await this.videoClubsRepository.getOne(options);
+    if (!videoClub) {
+      throw NotFound('Video club not found');
+    }
+    return this.videoClubsRepository.delete(options);
+  }
 
   async getAllForUser(userId: string) {
     return this.videoClubsRepository.getAllForUser(userId);

@@ -6,6 +6,16 @@ import { PrismaRepository } from '../common/factories/prisma-repository.factory'
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
 
+type CreateVideoClubOptions = {
+  name: string;
+  userId: string;
+};
+
+type DeleteVideoClubOptions = {
+  userId: string;
+  videoClubId: string;
+};
+
 type GetOneDetailOptions = {
   search: {
     actors?: string;
@@ -27,6 +37,28 @@ type GetOneOptions = {
 /* -------------------------------------------------------------------------- */
 @injectable()
 export class VideoClubsRepository extends PrismaRepository {
+  async create({ name, userId }: CreateVideoClubOptions, db = this.prisma.db) {
+    return db.videoClub.create({
+      data: {
+        inviteId: crypto.randomUUID(),
+        name,
+        users: {
+          connect: { id: userId }
+        },
+        watchId: crypto.randomUUID()
+      }
+    });
+  }
+
+  async delete({ userId, videoClubId }: DeleteVideoClubOptions, db = this.prisma.db) {
+    return db.videoClub.deleteMany({
+      where: {
+        id: videoClubId,
+        users: { some: { id: userId } }
+      }
+    });
+  }
+
   async getAllForUser(userId: string, db = this.prisma.db) {
     return db.videoClub.findMany({
       where: { users: { some: { id: userId } } }

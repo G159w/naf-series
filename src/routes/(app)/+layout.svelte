@@ -6,7 +6,7 @@
 </script>
 
 <Sidebar.Provider>
-  <AppSidebar user={data.session?.user} videoClubs={data.videoClubs.data ?? []} />
+  <AppSidebar user={data.session?.user} />
   <main class="w-full antialiased">
     <Sidebar.Trigger class="fixed" />
     {@render children?.()}

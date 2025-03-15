@@ -61,6 +61,44 @@ export class VideoClubsController extends AuthController {
               response: VideoClubDetailDtoSchema
             }
           )
+          .post(
+            '/',
+            async ({ body, user }) => {
+              const videoClub = await this.videoClubsService.create({
+                name: body.name,
+                userId: user.id
+              });
+              return toDto(VideoClubDtoSchema, videoClub);
+            },
+            {
+              body: t.Object({
+                name: t.String({ description: 'The name of the video club' })
+              }),
+              detail: {
+                description: 'Create a new video club',
+                summary: 'Create video club'
+              },
+              response: VideoClubDtoSchema
+            }
+          )
+          .delete(
+            '/:videoClubId',
+            async ({ params: { videoClubId }, user }) => {
+              await this.videoClubsService.delete({
+                userId: user.id,
+                videoClubId
+              });
+              return { success: true };
+            },
+            {
+              detail: {
+                description: 'Delete a video club',
+                summary: 'Delete video club'
+              },
+              params: t.Object({ videoClubId: t.String({ description: 'The video club id' }) }),
+              response: t.Object({ success: t.Boolean() })
+            }
+          )
       );
   }
 
