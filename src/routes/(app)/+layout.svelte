@@ -5,10 +5,16 @@
   let { children, data } = $props();
 </script>
 
-<Sidebar.Provider>
-  <AppSidebar user={data.session?.user} />
-  <main class="w-full antialiased">
-    <Sidebar.Trigger class="fixed" />
+{#if data.session?.user}
+  <Sidebar.Provider>
+    <AppSidebar user={data.session?.user} />
+    <main class="w-full antialiased">
+      <Sidebar.Trigger class="fixed z-[1] md:hidden" />
+      {@render children?.()}
+    </main>
+  </Sidebar.Provider>
+{:else}
+  <div class="flex h-screen min-h-screen w-full items-center justify-center antialiased">
     {@render children?.()}
-  </main>
-</Sidebar.Provider>
+  </div>
+{/if}
