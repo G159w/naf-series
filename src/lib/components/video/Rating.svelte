@@ -46,14 +46,14 @@
   });
 
   const submitComment = (rating?: number) => {
-    if (!rating && userRating) {
+    if (rating === undefined && userRating) {
       return $deleteCommentMutation.mutate({
         ratingId: userRating.id,
         videoClubId,
         videoId: video.id
       });
     }
-    if (userRating && rating) {
+    if (userRating && rating !== undefined) {
       return $editCommentMutation.mutate({
         rating: rating,
         ratingId: userRating.id,
@@ -61,7 +61,7 @@
         videoId: video.id
       });
     }
-    if (rating)
+    if (rating !== undefined)
       $postCommentMutation.mutate({
         rating: rating,
         videoClubId,
