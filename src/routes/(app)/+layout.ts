@@ -1,7 +1,15 @@
 import { queryHandler } from '$lib/tanstack-query';
 
 export const load = async ({ fetch, parent }) => {
-  const { queryClient } = await parent();
+  const { queryClient, session } = await parent();
 
-  await queryClient.prefetchQuery(queryHandler({ fetch }).videoClubs.findAll());
+  if (!session?.user) {
+    return {};
+  }
+  const queryOptions = queryHandler({ fetch }).videoClubs.findAll();
+
+  await queryClient.prefetchQuery({
+    queryFn: () => queryOptions.queryFn(),
+    queryKey: queryOptions.queryKey
+  });
 };

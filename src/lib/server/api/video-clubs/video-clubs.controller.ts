@@ -81,6 +81,28 @@ export class VideoClubsController extends AuthController {
               response: VideoClubDtoSchema
             }
           )
+          .post(
+            '/:videoClubId/join/:inviteId',
+            async ({ params: { inviteId, videoClubId }, user }) => {
+              const videoClub = await this.videoClubsService.joinByInvite({
+                inviteId,
+                userId: user.id,
+                videoClubId
+              });
+              return toDto(VideoClubDtoSchema, videoClub);
+            },
+            {
+              detail: {
+                description: 'Join a video club using an invitation link',
+                summary: 'Join video club'
+              },
+              params: t.Object({
+                inviteId: t.String({ description: 'The video club invitation id' }),
+                videoClubId: t.String({ description: 'The video club id' })
+              }),
+              response: VideoClubDtoSchema
+            }
+          )
           .delete(
             '/:videoClubId',
             async ({ params: { videoClubId }, user }) => {

@@ -5,14 +5,15 @@
   import * as Tabs from '$lib/components/ui/tabs/index';
   import { queryHandler } from '$lib/tanstack-query';
   import { cn } from '$lib/utils/ui';
-  import { createMutation, createQuery } from '@tanstack/svelte-query';
+  import { createMutation } from '@tanstack/svelte-query';
   import { Plus } from 'lucide-svelte';
   import { toast } from 'svelte-sonner';
+  import { derived, writable } from 'svelte/store';
 
   import { Button, buttonVariants } from '../ui/button';
   import { Input } from '../ui/input';
 
-  let search = $state('');
+  let search = writable('');
   let open = $state(false);
   let selectedVideoMovieDbId = $state<null | string>(null);
   let selectedType = $state<'movies' | 'series'>('movies');
@@ -23,19 +24,16 @@
 
   let { videoClubId }: HTMLAttributes<HTMLDivElement> & Props = $props();
 
-  let queryFn = $derived(() => {
-    return queryHandler({ fetch }).videos.searchVideos({ query: search, videoClubId });
+  let queryOptions = derived(search, () => {
+    return queryHandler({ fetch }).videos.searchVideos({ query: $search, videoClubId });
   });
 
-  const query = createQuery({
-    enabled: false,
-    queryFn: async () =>
-      queryHandler({ fetch })
-        .videos.searchVideos({ query: (() => search)(), videoClubId })
-        .queryFn(),
-
-    queryKey: queryFn().queryKey
-  });
+  const searchMutation = createMutation(
+    derived(queryOptions, () => ({
+      mutationFn: $queryOptions.queryFn,
+      mutationKey: $queryOptions.queryKey
+    }))
+  );
 
   const addVideoMutation = createMutation({
     mutationFn: queryHandler({ fetch }).videos.addVideo().mutationFn,
@@ -65,12 +63,22 @@
     </Dialog.Header>
     <form
       onsubmit={() => {
-        $query.refetch();
+        $searchMutation.mutate();
       }}
     >
-      <Input class="mt-4" placeholder="Nom du film" bind:value={search} type="text" />
+      <Input class="mt-4" placeholder="Nom du film" bind:value={$search} type="text" />
     </form>
-    {#if $query.isSuccess && $query.data.data}
+    {#if $searchMutation.isPending}
+      <div class="flex h-[350px] items-center justify-center">
+        <p class="text-sm font-thin">Recherche en cours...</p>
+      </div>
+    {/if}
+    {#if $searchMutation.isError}
+      <div class="flex h-[350px] items-center justify-center">
+        <p class="text-sm font-thin">Erreur lors de la recherche</p>
+      </div>
+    {/if}
+    {#if $searchMutation.isSuccess && $searchMutation.data.data}
       <Tabs.Root value="movies" class="h-[350px]">
         <Tabs.List class="w-full">
           <Tabs.Trigger value="movies" onclick={() => (selectedType = 'movies')} class="w-full">
@@ -82,7 +90,7 @@
         </Tabs.List>
         <Tabs.Content value="movies">
           <div class="flex flex-col pt-2">
-            {#each $query.data.data.movies as video (video.id)}
+            {#each $searchMutation.data.data.movies as video (video.id)}
               <Button
                 variant="ghost"
                 class={cn('flex h-14 items-center justify-start gap-2 px-0', {
@@ -107,7 +115,7 @@
         </Tabs.Content>
         <Tabs.Content value="series">
           <div class="flex flex-col pt-2">
-            {#each $query.data.data.series as video (video.id)}
+            {#each $searchMutation.data.data.series as video (video.id)}
               <Button
                 variant="ghost"
                 class={cn('flex h-14 items-center justify-start gap-2 px-0', {
@@ -130,14 +138,16 @@
         </Tabs.Content>
       </Tabs.Root>
       <div class="flex justify-end">
-        <Button disabled={!selectedVideoMovieDbId} onclick={() => addVideo()}>Ajouter</Button>
+        <Button
+          onclick={() => addVideo()}
+          disabled={$addVideoMutation.isPending || !selectedVideoMovieDbId}
+        >
+          {$addVideoMutation.isPending ? 'Ajout ...' : 'Ajouter'}
+        </Button>
       </div>
     {/if}
   </Dialog.Content>
 </Dialog.Root>
 
 <style scoped>
-  .broken-image {
-    background-color: #f3f4f6;
-  }
 </style>

@@ -8,8 +8,8 @@ export type RatingUpdateOrCreate = {
   note: number;
 };
 
-export const getUserSession = async (event: RequestEvent | ServerLoadEvent) => {
-  const session = await event.locals.auth();
+export const getUserSession = async (locals: (RequestEvent | ServerLoadEvent)['locals']) => {
+  const session = await locals.auth();
   if (!session?.user) throw error(401, 'You need to login');
   if (!session.user?.email) throw error(403);
   return session.user as { email: string };

@@ -4,6 +4,7 @@
   import { debounce } from '$lib/components/utils.svelte.js';
   import AddVideoDialog from '$lib/components/video-club/add-video-dialog.svelte';
   import VideoClubDeleteModal from '$lib/components/video-club/video-club-delete-modal.svelte';
+  import VideoClubShareModal from '$lib/components/video-club/video-club-share-modal.svelte';
   import VideoDrawer from '$lib/components/video/VideoDrawer.svelte';
   import dayjs from 'dayjs';
   import { Trash2 } from 'lucide-svelte';
@@ -25,16 +26,19 @@
 </script>
 
 <svelte:head>
-  <title>{data.videoClub.data?.name}</title>
+  <title>{data.videoClub?.name || 'VidéoClub non trouvé'}</title>
   <meta name="videoclub" content="NAF Series" />
 </svelte:head>
 
 <div class="flex h-full flex-col gap-12 px-8 align-middle">
   <div class="flex w-full flex-row items-center justify-center gap-4 pt-8">
     <div class="flex items-center gap-8">
-      <h1 class="text-4xl font-bold">{data.videoClub.data?.name}</h1>
+      <h1 class="text-4xl font-bold">{data.videoClub?.name}</h1>
       <div class="flex items-center gap-2">
-        <AddVideoDialog videoClubId={data.videoClub.data?.id || ''} />
+        <AddVideoDialog videoClubId={data.videoClub?.id || ''} />
+        {#if data.videoClub?.inviteId}
+          <VideoClubShareModal videoClubId={data.videoClub.id} inviteId={data.videoClub.inviteId} />
+        {/if}
         <Button variant="destructive" size="icon" onclick={openDeleteModal}>
           <Trash2 size={16} />
         </Button>
@@ -43,8 +47,8 @@
   </div>
   <Input oninput={(e) => search((e.target as HTMLInputElement).value)} />
   <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-    {#each data.videoClub.data?.videos ?? [] as video (video.id)}
-      <VideoDrawer {video} videoClubId={data.videoClub.data?.id || ''}>
+    {#each data.videoClub?.videos ?? [] as video (video.id)}
+      <VideoDrawer {video} videoClubId={data.videoClub?.id || ''}>
         <div
           class="flex w-full animate-fade flex-col items-start justify-center gap-2 rounded-sm border-[3px] border-transparent transition-all hover:border-primary"
         >
@@ -93,6 +97,6 @@
 
 <VideoClubDeleteModal
   bind:open={deleteModalOpen}
-  videoClubId={data.videoClub.data?.id || ''}
-  videoClubName={data.videoClub.data?.name || ''}
+  videoClubId={data.videoClub?.id || ''}
+  videoClubName={data.videoClub?.name || ''}
 />

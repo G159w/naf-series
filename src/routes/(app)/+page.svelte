@@ -10,7 +10,13 @@
   import { scale } from 'svelte/transition';
 
   let { data } = $props();
-  const query = createQuery(queryHandler({ fetch }).videoClubs.findAll());
+
+  const queryOptions = queryHandler({ fetch }).videoClubs.findAll();
+  const query = createQuery({
+    enabled: () => !!data.session,
+    queryFn: queryOptions.queryFn,
+    queryKey: queryOptions.queryKey
+  });
 
   const images = [
     'https://image.tmdb.org/t/p/w500/AnsSKR9LuK0T9bAOcPVA3PUvyWj.jpg',
@@ -74,7 +80,7 @@
     <img alt="NafSeries" src="nafseries.gif" class="w-96 p-4 md:mt-[25vh]" />
 
     {#if data.session}
-      {#if $query.data?.data}
+      {#if $query.data?.data && $query.data.data.length > 0}
         <div class="flex flex-col gap-4">
           <div
             class="flex max-w-96 flex-col items-center gap-4 font-bold underline underline-offset-4"

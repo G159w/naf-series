@@ -6,6 +6,11 @@ import { PrismaRepository } from '../common/factories/prisma-repository.factory'
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
 
+type AddMemberOptions = {
+  userId: string;
+  videoClubId: string;
+};
+
 type CreateVideoClubOptions = {
   name: string;
   userId: string;
@@ -13,6 +18,11 @@ type CreateVideoClubOptions = {
 
 type DeleteVideoClubOptions = {
   userId: string;
+  videoClubId: string;
+};
+
+type GetByInviteIdOptions = {
+  inviteId: string;
   videoClubId: string;
 };
 
@@ -32,11 +42,27 @@ type GetOneOptions = {
   videoClubId: string;
 };
 
+type IsMemberOptions = {
+  userId: string;
+  videoClubId: string;
+};
+
 /* -------------------------------------------------------------------------- */
 /*                                 Repository                                 */
 /* -------------------------------------------------------------------------- */
 @injectable()
 export class VideoClubsRepository extends PrismaRepository {
+  async addMember({ userId, videoClubId }: AddMemberOptions, db = this.prisma.db) {
+    return db.videoClub.update({
+      data: {
+        users: {
+          connect: { id: userId }
+        }
+      },
+      where: { id: videoClubId }
+    });
+  }
+
   async create({ name, userId }: CreateVideoClubOptions, db = this.prisma.db) {
     return db.videoClub.create({
       data: {
@@ -62,6 +88,15 @@ export class VideoClubsRepository extends PrismaRepository {
   async getAllForUser(userId: string, db = this.prisma.db) {
     return db.videoClub.findMany({
       where: { users: { some: { id: userId } } }
+    });
+  }
+
+  async getByInviteId({ inviteId, videoClubId }: GetByInviteIdOptions, db = this.prisma.db) {
+    return db.videoClub.findFirst({
+      where: {
+        id: videoClubId,
+        inviteId: inviteId
+      }
     });
   }
 
@@ -105,5 +140,15 @@ export class VideoClubsRepository extends PrismaRepository {
       },
       where: { id: videoClubId, users: { some: { id: userId } } }
     });
+  }
+
+  async isMember({ userId, videoClubId }: IsMemberOptions, db = this.prisma.db) {
+    const club = await db.videoClub.findFirst({
+      where: {
+        id: videoClubId,
+        users: { some: { id: userId } }
+      }
+    });
+    return !!club;
   }
 }

@@ -29,6 +29,12 @@ type GetOneOptions = {
   videoClubId: string;
 };
 
+type JoinByInviteOptions = {
+  inviteId: string;
+  userId: string;
+  videoClubId: string;
+};
+
 @injectable()
 export class VideoClubsService {
   constructor(private videoClubsRepository = inject(VideoClubsRepository)) {}
@@ -60,5 +66,33 @@ export class VideoClubsService {
 
   async getOne(options: GetOneOptions) {
     return this.videoClubsRepository.getOne(options);
+  }
+
+  async joinByInvite(options: JoinByInviteOptions) {
+    // Verify the club exists and the invite is valid
+    const videoClub = await this.videoClubsRepository.getByInviteId({
+      inviteId: options.inviteId,
+      videoClubId: options.videoClubId
+    });
+
+    if (!videoClub) {
+      throw NotFound('Invalid invitation link');
+    }
+
+    // Check if the user is already a member
+    const isMember = await this.videoClubsRepository.isMember({
+      userId: options.userId,
+      videoClubId: options.videoClubId
+    });
+
+    if (isMember) {
+      return videoClub; // User is already a member, just return the club
+    }
+
+    // Add the user to the club
+    return this.videoClubsRepository.addMember({
+      userId: options.userId,
+      videoClubId: options.videoClubId
+    });
   }
 }

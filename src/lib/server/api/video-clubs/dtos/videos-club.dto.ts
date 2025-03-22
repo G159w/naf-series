@@ -24,11 +24,13 @@ const VideoDtoSchema = Type.Object({
 
 export const VideoClubDetailDtoSchema = Type.Object({
   id: Type.String(),
+  inviteId: Type.String(),
   name: Type.String(),
   videos: Type.Array(VideoDtoSchema)
 });
 
 export const VideoClubDtoSchema = Type.Object({
   id: Type.String(),
+  inviteId: Type.String(),
   name: Type.String()
 });
