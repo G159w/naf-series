@@ -3,9 +3,9 @@ import Elysia, { t } from 'elysia';
 
 import { AuthController } from '../common/factories/controllers.factory';
 import { authGuard, toDto } from '../common/utils/elysia';
-import { DBMovieApiResultSearchSchema } from './dtos/dbmovie.dto';
-import { VideoDtoSchema } from './dtos/videos.dto';
-import { VideosService } from './videos.service';
+import { DBMovieApiResultSearchSchema } from './dto/dbmovie.dto';
+import { VideoDtoSchema } from './dto/video.dto';
+import { VideoService } from './video.service';
 
 enum Tags {
   Comments = 'Comments',
@@ -14,15 +14,15 @@ enum Tags {
 }
 
 @injectable()
-export class VideosController extends AuthController {
-  constructor(private videosService = inject(VideosService)) {
+export class VideoController extends AuthController {
+  constructor(private videosService = inject(VideoService)) {
     super();
   }
 
   routes() {
     return new Elysia({ tags: ['VideoClubs'] })
       .use(authGuard(this.sessionService))
-      .group('/video-clubs/:videoClubId/videos', (app) =>
+      .group('/video-club/:videoClubId/video', (app) =>
         app
           .post(
             '/',

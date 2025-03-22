@@ -2,7 +2,7 @@
   import type { HTMLAttributes } from 'svelte/elements';
 
   import { queryHandler } from '$lib/tanstack-query';
-  import { type GetVideoDetailResponse } from '$lib/tanstack-query/videos';
+  import { type GetVideoDetailResponse } from '$lib/tanstack-query/video';
   import { createMutation } from '@tanstack/svelte-query';
   import { Star, Trash } from 'lucide-svelte';
   import { toast } from 'svelte-sonner';
@@ -22,7 +22,7 @@
   const userRating = $derived(video.ratings.find((r) => r.user.id === userState.session?.user?.id));
 
   const deleteCommentMutation = createMutation({
-    mutationFn: queryHandler({ fetch }).videos.deleteRating().mutationFn,
+    mutationFn: queryHandler({ fetch }).video.deleteRating().mutationFn,
     onSuccess: () => {
       onUpdated?.();
       toast.success('🗑️ Note supprimée');
@@ -30,7 +30,7 @@
   });
 
   const postCommentMutation = createMutation({
-    mutationFn: queryHandler({ fetch }).videos.createRating().mutationFn,
+    mutationFn: queryHandler({ fetch }).video.createRating().mutationFn,
     onSuccess: () => {
       onUpdated?.();
       toast.success('✅ Note ajoutée');
@@ -38,7 +38,7 @@
   });
 
   const editCommentMutation = createMutation({
-    mutationFn: queryHandler({ fetch }).videos.updateRating().mutationFn,
+    mutationFn: queryHandler({ fetch }).video.updateRating().mutationFn,
     onSuccess: () => {
       onUpdated?.();
       toast.success('✅ Note modifiée');

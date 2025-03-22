@@ -8,7 +8,7 @@ export const load = async ({ fetch, params, parent, url }) => {
   const author = url.searchParams.get('author') ?? undefined;
   const actor = url.searchParams.get('actor') ?? undefined;
 
-  const queryOptions = queryHandler({ fetch }).videoClubs.findOne({
+  const queryOptions = queryHandler({ fetch }).videoClub.findOne({
     actor: actor,
     author: author,
     title: title,

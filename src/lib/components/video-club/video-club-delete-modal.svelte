@@ -11,18 +11,14 @@
   export let videoClubId: string;
   export let videoClubName: string;
 
-  let isDeleting = false;
-
   const queryClient = useQueryClient();
 
   const deleteVideoClubMutation = createMutation({
-    ...queryHandler({ fetch }).videoClubs.delete(),
+    ...queryHandler({ fetch }).videoClub.delete(),
     onError: () => {
-      isDeleting = false;
       toast.error("Une erreur s'est produite lors de la suppression du VideoClub");
     },
     onSuccess: () => {
-      isDeleting = false;
       open = false;
       // Invalidate the layout video clubs query
       queryClient.invalidateQueries({ queryKey: ['videoClubs', 'getAll'] });
@@ -31,8 +27,9 @@
     }
   });
 
+  let isDeleting = $deleteVideoClubMutation.isPending;
+
   function handleDelete() {
-    isDeleting = true;
     $deleteVideoClubMutation.mutate({ videoClubId });
   }
 

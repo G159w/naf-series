@@ -4,14 +4,14 @@ import { inject, injectable } from '@needle-di/core';
 import Elysia from 'elysia';
 
 import { Conflict, httpError } from './common/utils/exceptions';
-import { VideoClubsController } from './video-clubs/video-clubs.controller';
-import { VideosController } from './videos/videos.controller';
+import { VideoClubController } from './video-club/video-club.controller';
+import { VideoController } from './video/video.controller';
 
 @injectable()
 export class ApplicationController {
   constructor(
-    private videoClubsController = inject(VideoClubsController),
-    private videosController = inject(VideosController)
+    private videoClubsController = inject(VideoClubController),
+    private videosController = inject(VideoController)
   ) {}
 
   async registerControllers() {

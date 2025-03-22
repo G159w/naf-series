@@ -1,6 +1,6 @@
 import { inject } from '@needle-di/core';
 
-import { SessionsService } from '../../sessions/sessions.service';
+import { SessionsService } from '../../session/session.service';
 import { createElysia } from '../utils/elysia';
 
 export abstract class AuthController {

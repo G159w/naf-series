@@ -2,7 +2,7 @@ import { type Static, type TSchema, Type } from '@sinclair/typebox';
 import { Value } from '@sinclair/typebox/value';
 import { Elysia } from 'elysia';
 
-import type { SessionsService } from '../../sessions/sessions.service';
+import type { SessionsService } from '../../session/session.service';
 
 import { Unauthorized } from './exceptions';
 

@@ -11,7 +11,7 @@
 
   let { data } = $props();
 
-  const queryOptions = queryHandler({ fetch }).videoClubs.findAll();
+  const queryOptions = queryHandler({ fetch }).videoClub.findAll();
   const query = createQuery({
     enabled: () => !!data.session,
     queryFn: queryOptions.queryFn,

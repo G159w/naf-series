@@ -3,19 +3,19 @@ import Elysia, { t } from 'elysia';
 
 import { AuthController } from '../common/factories/controllers.factory';
 import { authGuard, toDto } from '../common/utils/elysia';
-import { VideoClubDetailDtoSchema, VideoClubDtoSchema } from './dtos/videos-club.dto';
-import { VideoClubsService } from './video-clubs.service';
+import { VideoClubDetailDtoSchema, VideoClubDtoSchema } from './dto/video-club.dto';
+import { VideoClubService } from './video-club.service';
 
 @injectable()
-export class VideoClubsController extends AuthController {
-  constructor(private videoClubsService = inject(VideoClubsService)) {
+export class VideoClubController extends AuthController {
+  constructor(private videoClubsService = inject(VideoClubService)) {
     super();
   }
 
   routes() {
     return new Elysia({ tags: ['VideoClubs'] })
       .use(authGuard(this.sessionService))
-      .group('/video-clubs', (app) =>
+      .group('/video-club', (app) =>
         app
           .get(
             '/',

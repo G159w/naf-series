@@ -51,7 +51,7 @@ type IsMemberOptions = {
 /*                                 Repository                                 */
 /* -------------------------------------------------------------------------- */
 @injectable()
-export class VideoClubsRepository extends PrismaRepository {
+export class VideoClubRepository extends PrismaRepository {
   async addMember({ userId, videoClubId }: AddMemberOptions, db = this.prisma.db) {
     return db.videoClub.update({
       data: {

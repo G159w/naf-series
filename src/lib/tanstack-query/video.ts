@@ -65,7 +65,7 @@ type UpdateRatingOptions = {
   videoId: string;
 };
 
-type VideoEndPoint = ReturnType<ReturnType<Api['video-clubs']>['videos']>;
+type VideoEndPoint = ReturnType<ReturnType<Api['video-club']>['video']>;
 
 /* -------------------------------------------------------------------------- */
 /*                                     Api                                    */
@@ -76,7 +76,7 @@ export class VideosModule extends TanstackQueryModule<'videos'> {
   addVideo() {
     return {
       mutationFn: async (options: AddVideoOptions) =>
-        await this.api['video-clubs']({ videoClubId: options.videoClubId }).videos['index'].post({
+        await this.api['video-club']({ videoClubId: options.videoClubId }).video['index'].post({
           movieDbId: options.movieDbId,
           type: options.type
         })
@@ -86,8 +86,8 @@ export class VideosModule extends TanstackQueryModule<'videos'> {
   createRating() {
     return {
       mutationFn: async (options: CreateRatingOptions) =>
-        await this.api['video-clubs']({ videoClubId: options.videoClubId })
-          .videos({ videoId: options.videoId })
+        await this.api['video-club']({ videoClubId: options.videoClubId })
+          .video({ videoId: options.videoId })
           ['ratings']['post']({ rating: options.rating })
     };
   }
@@ -95,8 +95,8 @@ export class VideosModule extends TanstackQueryModule<'videos'> {
   deleteComment() {
     return {
       mutationFn: async (options: DeleteCommentOptions) =>
-        await this.api['video-clubs']({ videoClubId: options.videoClubId })
-          .videos({ videoId: options.videoId })
+        await this.api['video-club']({ videoClubId: options.videoClubId })
+          .video({ videoId: options.videoId })
           ['comments']({ commentId: options.commentId })
           .delete()
     };
@@ -105,8 +105,8 @@ export class VideosModule extends TanstackQueryModule<'videos'> {
   deleteRating() {
     return {
       mutationFn: async (options: DeleteRatingOptions) =>
-        await this.api['video-clubs']({ videoClubId: options.videoClubId })
-          .videos({ videoId: options.videoId })
+        await this.api['video-club']({ videoClubId: options.videoClubId })
+          .video({ videoId: options.videoId })
           ['ratings']({ ratingId: options.ratingId })
           ['delete']()
     };
@@ -115,8 +115,8 @@ export class VideosModule extends TanstackQueryModule<'videos'> {
   getDetail(options: GetVideoDetailOptions): ApiQuery<GetVideoDetail> {
     return {
       queryFn: async () =>
-        await this.api['video-clubs']({ videoClubId: options.videoClubId })
-          .videos({ videoId: options.videoId })
+        await this.api['video-club']({ videoClubId: options.videoClubId })
+          .video({ videoId: options.videoId })
           .get(),
       queryKey: [this.namespace, 'detail', options]
     };
@@ -124,15 +124,15 @@ export class VideosModule extends TanstackQueryModule<'videos'> {
   postComment() {
     return {
       mutationFn: async (options: PostCommentOptions) =>
-        await this.api['video-clubs']({ videoClubId: options.videoClubId })
-          .videos({ videoId: options.videoId })
+        await this.api['video-club']({ videoClubId: options.videoClubId })
+          .video({ videoId: options.videoId })
           ['comments']['post']({ content: options.content })
     };
   }
   searchVideos(options: SearchVideoOptions) {
     return {
       queryFn: async () =>
-        await this.api['video-clubs']({ videoClubId: options.videoClubId }).videos.search.get({
+        await this.api['video-club']({ videoClubId: options.videoClubId }).video.search.get({
           query: { query: options.query }
         }),
       queryKey: [this.namespace, 'search', options]
@@ -141,8 +141,8 @@ export class VideosModule extends TanstackQueryModule<'videos'> {
   updateRating() {
     return {
       mutationFn: async (options: UpdateRatingOptions) =>
-        await this.api['video-clubs']({ videoClubId: options.videoClubId })
-          .videos({ videoId: options.videoId })
+        await this.api['video-club']({ videoClubId: options.videoClubId })
+          .video({ videoId: options.videoId })
           ['ratings']({ ratingId: options.ratingId })
           ['put']({ rating: options.rating })
     };

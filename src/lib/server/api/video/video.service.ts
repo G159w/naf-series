@@ -2,7 +2,7 @@ import { inject, injectable } from '@needle-di/core';
 
 import { NotFound } from '../common/utils/exceptions';
 import { MovieDbService } from './imdb.service';
-import { VideosRepository } from './videos.repository';
+import { VideoRepository } from './video.repository';
 
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */
@@ -45,9 +45,9 @@ type RemoveVideoFromVideoClubOptions = {
 /* -------------------------------------------------------------------------- */
 
 @injectable()
-export class VideosService {
+export class VideoService {
   constructor(
-    private videosRepository = inject(VideosRepository),
+    private videosRepository = inject(VideoRepository),
     private movieDbService = inject(MovieDbService)
   ) {}
 

@@ -1,12 +1,12 @@
 import type { Treaty } from '@elysiajs/eden';
 
 import { TanstackQueryModule } from './query-module';
-import { VideoClubsModule } from './video-clubs';
-import { VideosModule } from './videos';
+import { VideosModule } from './video';
+import { VideoClubModule } from './video-club';
 
 class TanstackQueryHandler extends TanstackQueryModule {
-  videoClubs = new VideoClubsModule(this.opts);
-  videos = new VideosModule(this.opts);
+  video = new VideosModule(this.opts);
+  videoClub = new VideoClubModule(this.opts);
 }
 
 export const queryHandler = (opts: { fetch: typeof fetch; fetchConfig?: Treaty.Config }) => {

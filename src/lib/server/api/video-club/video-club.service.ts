@@ -1,7 +1,7 @@
 import { inject, injectable } from '@needle-di/core';
 
 import { NotFound } from '../common/utils/exceptions';
-import { VideoClubsRepository } from './video-clubs.repository';
+import { VideoClubRepository } from './video-club.repository';
 
 type CreateVideoClubOptions = {
   name: string;
@@ -36,8 +36,8 @@ type JoinByInviteOptions = {
 };
 
 @injectable()
-export class VideoClubsService {
-  constructor(private videoClubsRepository = inject(VideoClubsRepository)) {}
+export class VideoClubService {
+  constructor(private videoClubsRepository = inject(VideoClubRepository)) {}
 
   async create(options: CreateVideoClubOptions) {
     return this.videoClubsRepository.create(options);

@@ -6,7 +6,7 @@ export const load = async ({ fetch, parent }) => {
   if (!session?.user) {
     return {};
   }
-  const queryOptions = queryHandler({ fetch }).videoClubs.findAll();
+  const queryOptions = queryHandler({ fetch }).videoClub.findAll();
 
   await queryClient.prefetchQuery({
     queryFn: () => queryOptions.queryFn(),

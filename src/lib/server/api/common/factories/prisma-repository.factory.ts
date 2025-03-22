@@ -1,6 +1,6 @@
 import { Container } from '@needle-di/core';
 
-import { PrismaService } from '../../databases/prisma';
+import { PrismaService } from '../../database/prisma';
 
 export abstract class PrismaRepository {
   protected readonly prisma: PrismaService;

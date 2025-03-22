@@ -1,6 +1,6 @@
 import { inject, injectable } from '@needle-di/core';
 
-import { SessionsRepository } from './sessions.repository';
+import { SessionsRepository } from './session.repository';
 
 @injectable()
 export class SessionsService {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { GetVideoDetailResponse } from '$lib/tanstack-query/videos';
+  import type { GetVideoDetailResponse } from '$lib/tanstack-query/video';
 
   import { queryHandler } from '$lib/tanstack-query';
   import { createMutation } from '@tanstack/svelte-query';
@@ -23,7 +23,7 @@
   let commentContent = $state('');
 
   const deleteCommentMutation = createMutation({
-    mutationFn: queryHandler({ fetch }).videos.deleteComment().mutationFn,
+    mutationFn: queryHandler({ fetch }).video.deleteComment().mutationFn,
     onSuccess: () => {
       onUpdated?.();
       toast.success('🗑️ Commentaire supprimé');
@@ -31,7 +31,7 @@
   });
 
   const postCommentMutation = createMutation({
-    mutationFn: queryHandler({ fetch }).videos.postComment().mutationFn,
+    mutationFn: queryHandler({ fetch }).video.postComment().mutationFn,
     onSuccess: () => {
       addComment = false;
       onUpdated?.();

@@ -1,4 +1,4 @@
-import { prisma } from '$lib/server/api/databases/prisma';
+import { prisma } from '$lib/server/api/database/prisma';
 import Google from '@auth/core/providers/google';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { SvelteKitAuth } from '@auth/sveltekit';

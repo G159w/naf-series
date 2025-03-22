@@ -52,7 +52,7 @@ type UpsertRatingOptions = {
 /*                                 Repository                                 */
 /* -------------------------------------------------------------------------- */
 @injectable()
-export class VideosRepository extends PrismaRepository {
+export class VideoRepository extends PrismaRepository {
   async addVideoToVideoClub(options: AddVideoToVideoClubOptions, db = this.prisma.db) {
     return db.video.update({
       data: { videoClubs: { connect: { id: options.videoClubId } } },

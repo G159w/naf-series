@@ -25,7 +25,7 @@
   let { videoClubId }: HTMLAttributes<HTMLDivElement> & Props = $props();
 
   let queryOptions = derived(search, () => {
-    return queryHandler({ fetch }).videos.searchVideos({ query: $search, videoClubId });
+    return queryHandler({ fetch }).video.searchVideos({ query: $search, videoClubId });
   });
 
   const searchMutation = createMutation(
@@ -36,7 +36,7 @@
   );
 
   const addVideoMutation = createMutation({
-    mutationFn: queryHandler({ fetch }).videos.addVideo().mutationFn,
+    mutationFn: queryHandler({ fetch }).video.addVideo().mutationFn,
     onSuccess: () => {
       open = false;
       toast.success('✅ Vidéo ajoutée');

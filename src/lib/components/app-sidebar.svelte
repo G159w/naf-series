@@ -26,7 +26,7 @@
     modalOpen = true;
   }
 
-  const query = createQuery(queryHandler({ fetch }).videoClubs.findAll());
+  const query = createQuery(queryHandler({ fetch }).videoClub.findAll());
 </script>
 
 <Sidebar.Root>

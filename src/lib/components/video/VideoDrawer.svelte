@@ -3,7 +3,7 @@
 
   import * as Drawer from '$lib/components/ui/drawer/index.js';
   import { queryHandler } from '$lib/tanstack-query';
-  import { type VideoClubDetailResponse } from '$lib/tanstack-query/video-clubs';
+  import { type VideoClubDetailResponse } from '$lib/tanstack-query/video-club';
   import { createQuery } from '@tanstack/svelte-query';
   import dayjs from 'dayjs';
   import { Star, X } from 'lucide-svelte';
@@ -23,7 +23,7 @@
   let open = $state(false);
 
   const query = createQuery(
-    queryHandler({ fetch }).videos.getDetail({ videoClubId, videoId: video.id })
+    queryHandler({ fetch }).video.getDetail({ videoClubId, videoId: video.id })
   );
 </script>
 

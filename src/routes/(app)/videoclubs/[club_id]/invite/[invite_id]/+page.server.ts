@@ -13,7 +13,7 @@ export const load = async ({ fetch, locals, params }) => {
   }
 
   // If user exists, join the video club
-  const queryOptions = queryHandler({ fetch }).videoClubs.join({
+  const queryOptions = queryHandler({ fetch }).videoClub.join({
     inviteId: params.invite_id,
     videoClubId: params.club_id
   });

@@ -16,7 +16,7 @@
   const queryClient = useQueryClient();
 
   const createVideoClubMutation = createMutation({
-    ...queryHandler({ fetch }).videoClubs.create(),
+    ...queryHandler({ fetch }).videoClub.create(),
     onError: () => {
       error = "Une erreur s'est produite lors de la création du VideoClub";
       isSubmitting = false;
@@ -29,7 +29,7 @@
 
       // Invalidate the layout video clubs query
       queryClient.refetchQueries({
-        queryKey: queryHandler({ fetch }).videoClubs.findAll().queryKey
+        queryKey: queryHandler({ fetch }).videoClub.findAll().queryKey
       });
       if (data.data) {
         goto(`/videoclubs/${data.data.id}`);
