@@ -9,14 +9,12 @@ export const load = async ({ fetch, params, parent, url }) => {
   const actor = url.searchParams.get('actor') ?? undefined;
 
   const queryOptions = queryHandler({ fetch }).videoClub.findOne({
-    actor: actor,
-    author: author,
-    title: title,
     videoClubId: params.club_id
   });
 
   const response = await queryClient.fetchQuery({
-    queryFn: queryOptions.queryFn,
+    queryFn: () => queryOptions.queryFn({ actor, author, title }),
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: queryOptions.queryKey
   });
 
@@ -24,5 +22,6 @@ export const load = async ({ fetch, params, parent, url }) => {
     console.error('Video club not found or not accessible:', response.error.value.message);
     throw redirect(302, '/');
   }
+
   return { videoClub: response.data };
 };

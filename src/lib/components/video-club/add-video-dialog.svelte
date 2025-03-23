@@ -5,8 +5,7 @@
   import * as Tabs from '$lib/components/ui/tabs/index';
   import { queryHandler } from '$lib/tanstack-query';
   import { cn } from '$lib/utils/ui';
-  import { createMutation } from '@tanstack/svelte-query';
-  import { Plus } from 'lucide-svelte';
+  import { createMutation, useQueryClient } from '@tanstack/svelte-query';
   import { toast } from 'svelte-sonner';
   import { derived, writable } from 'svelte/store';
 
@@ -22,7 +21,13 @@
     videoClubId: string;
   }
 
-  let { videoClubId }: HTMLAttributes<HTMLDivElement> & Props = $props();
+  let {
+    children,
+    class: childClass,
+    videoClubId
+  }: HTMLAttributes<HTMLDivElement> & Props = $props();
+
+  const queryClient = useQueryClient();
 
   let queryOptions = derived(search, () => {
     return queryHandler({ fetch }).video.searchVideos({ query: $search, videoClubId });
@@ -39,6 +44,7 @@
     mutationFn: queryHandler({ fetch }).video.addVideo().mutationFn,
     onSuccess: () => {
       open = false;
+      queryClient.invalidateQueries({ queryKey: ['videoClub', 'findOne', videoClubId] });
       toast.success('✅ Vidéo ajoutée');
     }
   });
@@ -55,7 +61,9 @@
 
 <Dialog.Root bind:open>
   <Dialog.Trigger class={buttonVariants({ variant: 'ghost' })} onclick={() => (open = true)}>
-    <Plus width="16" />
+    {#snippet child({ props })}
+      <div {...props} class={cn(childClass)}>{@render children?.()}</div>
+    {/snippet}
   </Dialog.Trigger>
   <Dialog.Content>
     <Dialog.Header>
@@ -66,7 +74,12 @@
         $searchMutation.mutate();
       }}
     >
-      <Input class="mt-4" placeholder="Nom du film" bind:value={$search} type="text" />
+      <Input
+        class="mt-4"
+        placeholder="Nom du film / série à retrouver"
+        bind:value={$search}
+        type="text"
+      />
     </form>
     {#if $searchMutation.isPending}
       <div class="flex h-[350px] items-center justify-center">

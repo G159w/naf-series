@@ -9,7 +9,7 @@ export const load = async ({ fetch, parent }) => {
   const queryOptions = queryHandler({ fetch }).videoClub.findAll();
 
   await queryClient.prefetchQuery({
-    queryFn: () => queryOptions.queryFn(),
+    queryFn: queryOptions.queryFn,
     queryKey: queryOptions.queryKey
   });
 };

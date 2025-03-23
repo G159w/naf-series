@@ -2,17 +2,15 @@
   import { page } from '$app/stores';
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
-  import { Share } from 'lucide-svelte';
   import { toast } from 'svelte-sonner';
 
   type Props = {
     inviteId: string;
+    open?: boolean;
     videoClubId: string;
   };
 
-  let { inviteId, videoClubId }: Props = $props();
-
-  let open = $state(false);
+  let { inviteId, open = $bindable(false), videoClubId }: Props = $props();
 
   // Generate the invitation URL
   const inviteUrl = $derived(`${$page.url.origin}/videoclubs/${videoClubId}/invite/${inviteId}`);
@@ -32,12 +30,6 @@
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Trigger>
-    <Button variant="outline" size="sm" class="flex gap-2">
-      <Share size={16} />
-      <span>Inviter</span>
-    </Button>
-  </Dialog.Trigger>
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>Inviter des amis au VideoClub</Dialog.Title>

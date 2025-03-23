@@ -34,17 +34,20 @@ type JoinVideoClubOptions = {
 type VideoClubDetail = ReturnType<Api['video-club']>['get'];
 
 type VideoClubDetailOptions = {
+  videoClubId: string;
+};
+
+type VideoClubDetailSearchParams = {
   actor?: string;
   author?: string;
   title?: string;
-  videoClubId: string;
 };
 
 /* -------------------------------------------------------------------------- */
 /*                                     Api                                    */
 /* -------------------------------------------------------------------------- */
-export class VideoClubModule extends TanstackQueryModule<'videoClubs'> {
-  public namespace: 'videoClubs' | null = 'videoClubs';
+export class VideoClubModule extends TanstackQueryModule<'videoClub'> {
+  public namespace: 'videoClub' | null = 'videoClub';
 
   create() {
     return {
@@ -71,13 +74,13 @@ export class VideoClubModule extends TanstackQueryModule<'videoClubs'> {
     };
   }
 
-  findOne(options: VideoClubDetailOptions): ApiQuery<VideoClubDetail> {
+  findOne({ videoClubId }: VideoClubDetailOptions) {
     return {
-      queryFn: () =>
-        this.api['video-club']({ videoClubId: options.videoClubId }).get({
-          query: removeEmpty({ actor: options.actor, author: options.author, title: options.title })
+      queryFn: ({ actor, author, title }: VideoClubDetailSearchParams) =>
+        this.api['video-club']({ videoClubId: videoClubId }).get({
+          query: removeEmpty({ actor: actor, author: author, title: title })
         }),
-      queryKey: [this.namespace, 'videoClub', options]
+      queryKey: [this.namespace, 'findOne', videoClubId]
     };
   }
 

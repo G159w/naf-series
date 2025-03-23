@@ -83,14 +83,14 @@
       {#if $query.data?.data && $query.data.data.length > 0}
         <div class="flex flex-col gap-4">
           <div
-            class="flex max-w-96 flex-col items-center gap-4 font-bold underline underline-offset-4"
+            class="flex w-full max-w-96 flex-col items-center gap-4 font-bold underline underline-offset-4"
           >
             Vos VideoClubs
           </div>
-          <div class="flex flex-wrap justify-center gap-4 p-4">
+          <div class="flex max-w-96 flex-wrap justify-center gap-4 p-4">
             {#each $query.data.data as club (club.id)}
               <Button
-                class="btn variant-filled-primary"
+                class="btn variant-filled-primary truncate"
                 href={`/videoclubs/${club.id}`}
                 variant="outline"
               >
