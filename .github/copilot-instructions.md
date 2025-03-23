@@ -8,7 +8,7 @@ The commits messages must respect this format:
 Where:
 - `<gitmoji>`: A gitmoji that represents the type of change you are making. You can find a list of available gitmojis [here](https://gitmoji.dev/).
 - `<scope>`: A short description of the area of the codebase that is affected by the change. 
-- `<subject>`: A short description of the change you are making. It should be written in the imperative mood and should not exceed 72 characters. the first works should be a verb in the present tense.
+- `<subject>`: A short description of the change you are making. It should be written in the imperative mood and should not exceed 72 characters all lowercase. the first word should be a verb in the present tense.
 - `<body>`: A more detailed description of the change you are making more readable for humans.
 
 # Application

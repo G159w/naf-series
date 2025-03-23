@@ -9,6 +9,7 @@ export const load = async ({ fetch, locals, params }) => {
   const user = await getUserSession(locals);
 
   if (!user) {
+    console.error('User not found in session');
     return { message: `Vous devez vous connecter pour rejoindre ce VideoClub`, success: false };
   }
 

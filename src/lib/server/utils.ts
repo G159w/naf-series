@@ -1,4 +1,4 @@
-import { error, type RequestEvent, type ServerLoadEvent } from '@sveltejs/kit';
+import { type RequestEvent, type ServerLoadEvent } from '@sveltejs/kit';
 
 export type CommentUpdateOrCreate = {
   content: string;
@@ -10,8 +10,8 @@ export type RatingUpdateOrCreate = {
 
 export const getUserSession = async (locals: (RequestEvent | ServerLoadEvent)['locals']) => {
   const session = await locals.auth();
-  if (!session?.user) throw error(401, 'You need to login');
-  if (!session.user?.email) throw error(403);
+  if (!session?.user) return undefined;
+  if (!session.user?.email) return undefined;
   return session.user as { email: string };
 };
 

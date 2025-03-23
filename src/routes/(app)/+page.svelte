@@ -108,7 +108,9 @@
     {:else}
       <h3>Visitez vos <b class="text-primary-500">VideoClubs</b> en ligne avec vos amis</h3>
       <SignIn provider="google">
-        <Button slot="submitButton" class="btn variant-filled-primary">Se connecter</Button>
+        <Button slot="submitButton" class="btn variant-filled-primary" type="submit">
+          Se connecter
+        </Button>
       </SignIn>
     {/if}
     <!-- Footer -->

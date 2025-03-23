@@ -5,15 +5,24 @@
   let { data } = $props();
 </script>
 
+<svelte:head>
+  <title>Rejoindre un VideoCLub</title>
+  <meta name="videoclub" content="NAF Series" />
+</svelte:head>
+
 <div class="flex h-full flex-col items-center justify-center gap-12 p-8 text-center">
   {#if !data.success && data.message}
+    <img alt="NafSeries" src="/nafseries.gif" class="w-96 p-4" />
+
     <h2 class="text-2xl font-bold">{data.message}</h2>
 
     {#if data.message.includes('connecter')}
       <div class="flex flex-col items-center gap-6">
         <p>Connectez-vous pour rejoindre le VideoClub</p>
         <SignIn provider="google">
-          <Button slot="submitButton" class="btn variant-filled-primary">Se connecter</Button>
+          <Button slot="submitButton" class="btn variant-filled-primary" type="submit">
+            Se connecter
+          </Button>
         </SignIn>
       </div>
     {/if}

@@ -99,7 +99,7 @@
       placeholder="Rechercher..."
     />
     <div
-      class=" @lg/videos:grid-cols-2 @4xl/videos:grid-cols-3 @7xl/videos:grid-cols-4 grid grid-cols-1 items-center justify-center gap-8"
+      class="@lg/videos:grid-cols-2 @4xl/videos:grid-cols-3 @7xl/videos:grid-cols-4 grid grid-cols-1 items-center justify-center gap-8"
     >
       <div class="flex w-full animate-fade flex-col items-center justify-center gap-2">
         <AddVideoDialog
@@ -143,13 +143,17 @@
                 </div>
               </div>
               <h1
-                class=" absolute bottom-0 flex w-full justify-start bg-black/70 p-2 text-left font-bold"
+                class="absolute bottom-0 flex w-full justify-start bg-black/70 p-2 text-left font-bold"
               >
                 <div>
-                  <div class="font-timeburner">
+                  <div
+                    class="@lg/videos:text-sm @4xl/videos:text-xs @7xl/videos:text-sm line-clamp-1 text-lg"
+                  >
                     {video.title}
                   </div>
-                  <div class="text-sm font-light text-red-500">
+                  <div
+                    class="@lg/videos:text-sm @4xl/videos:text-xs @7xl/videos:text-sm text-sm font-light text-red-500"
+                  >
                     {dayjs(video.releaseDate).format('DD/MM/YYYY')}
                   </div>
                 </div>
