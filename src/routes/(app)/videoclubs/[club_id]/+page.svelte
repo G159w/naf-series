@@ -60,7 +60,7 @@
   <meta name="videoclub" content="NAF Series" />
 </svelte:head>
 
-{#if !videoClub}
+{#if !videoClub || $query.isLoading}
   <Button variant="ghost" size="icon" onclick={() => $query.refetch({})}>
     <Plus size={16} />
   </Button>
