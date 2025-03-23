@@ -1,12 +1,13 @@
 import type { Config } from 'tailwindcss';
 
+import containerQueries from '@tailwindcss/container-queries';
 import tailwindcssAnimate from 'tailwindcss-animated';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 const config: Config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   darkMode: ['class'],
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, containerQueries],
   safelist: ['dark'],
   theme: {
     container: {

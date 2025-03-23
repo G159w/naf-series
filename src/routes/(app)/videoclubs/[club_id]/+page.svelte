@@ -17,6 +17,8 @@
   import { derived as storeDerived } from 'svelte/store';
   import { queryParameters } from 'sveltekit-search-params';
 
+  let { data } = $props();
+
   const params = queryParameters();
 
   let deleteModalOpen = $state(false);
@@ -50,9 +52,7 @@
     shareModalOpen = true;
   }
 
-  const videoClub = $derived($query.data?.data);
-  // console.log('videoClub', videoClub);
-  // console.log('club_id', page.params.club_id);
+  const videoClub = $derived($query.data?.data ?? data.videoClub);
 </script>
 
 <svelte:head>
@@ -68,7 +68,7 @@
     <h1 class="text-4xl font-bold">VidéoClub non trouvé</h1>
   </div>
 {:else}
-  <div class="flex h-full flex-col gap-12 px-8 align-middle">
+  <div class="@container/videos flex h-full flex-col gap-12 px-8 align-middle">
     <div class="flex w-full flex-row items-center justify-center gap-4 pt-8">
       <div class="flex items-end gap-8">
         <h1 class="text-4xl font-bold">{videoClub.name}</h1>
@@ -98,13 +98,13 @@
       oninput={(e) => search((e.target as HTMLInputElement).value)}
       placeholder="Rechercher..."
     />
-    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      <div
-        class="flex w-full animate-fade flex-col items-start justify-center gap-2 rounded-sm border-[3px] border-transparent bg-white/5 transition-all hover:border-primary"
-      >
+    <div
+      class=" @lg/videos:grid-cols-2 @4xl/videos:grid-cols-3 @7xl/videos:grid-cols-4 grid grid-cols-1 items-center justify-center gap-8"
+    >
+      <div class="flex w-full animate-fade flex-col items-center justify-center gap-2">
         <AddVideoDialog
-          videoClubId={videoClub.id || ''}
-          class="aspect-video h-full w-full items-center justify-center"
+          videoClubId={videoClub.id}
+          class="aspect-video h-full w-full max-w-[400px] items-center justify-center rounded-sm border-[3px] border-transparent bg-white/5 transition-all hover:border-primary"
         >
           <Button
             variant="ghost"
@@ -114,15 +114,15 @@
           </Button>
         </AddVideoDialog>
       </div>
-      {#each videoClub.videos ?? [] as video (video.id)}
+      {#each videoClub.videos as video (video.id)}
         <VideoDrawer {video} videoClubId={videoClub.id || ''}>
-          <div
-            class="flex w-full animate-fade flex-col items-start justify-center gap-2 rounded-sm border-[3px] border-transparent transition-all hover:border-primary"
-          >
-            <div class="relative rounded-sm">
+          <div class="flex w-full animate-fade flex-col items-center justify-center gap-2">
+            <div
+              class="relative rounded-sm border-[3px] border-transparent transition-all hover:border-primary"
+            >
               <img
-                class="w-[600px] rounded-sm"
-                width="600"
+                class="w-[400px] rounded-sm"
+                width="400"
                 src={`https://image.tmdb.org/t/p/w500${video.backdropPath}`}
                 alt={video.title}
               />
